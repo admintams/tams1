@@ -1,0 +1,164 @@
+﻿@model PAY.Common.Entities.Employee
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Payslip";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 12px !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Payslip- [ <span id="ctr">EMP002 - Macky Reyes</span> ] <span> <button>...</button></span></b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active">Payslip</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+}
+
+<div class="row">
+    <div class="col-md-8" id="drPreview">
+        <div class="box box-warning">
+            <div class="box-header with-border">
+                <div class="box-body">
+                    <div class="col-md-12">
+                        <div class="row col-md-12" style="padding-left: 0px; padding-right: 0px;">
+                            <p style="text-align: left; font-size:medium"><strong>ThinkPlus Systems</strong></p>
+                        </div>
+
+                        <div class="row col-md-12" style="padding-left: 0px; padding-right: 0px; margin-top: -10px;">
+                            <p class="pull-left">[EMP002] - Macky Reyes </p>
+                            <p class="pull-right">Payroll Period: January 01-15, 2023 </p>
+                        </div>
+                        <div class="row col-md-12" style="padding-left: 0px; padding-right: 0px; margin-top:-10px;">
+                            <p class="pull-left">MIS Department</p>
+                            <p class="pull-right">Credit Date: January 25, 2023</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2" style="margin-left:30px;">
+                        <div class="row" style="margin-left:10px;">
+                            <p class="pull-left">Basic Pay:</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p class="pull-left" style="margin-top: -8px;">Leave w/ Pay</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p class="pull-left" style="margin-top: -8px;">Reg OT Hrs</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p class="pull-left" style="margin-top: -8px;">Late</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p class="pull-left">GROSS PAY:</p>
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -3px;">64 hrs</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -5px;">8 hrs</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -8px;">2 hrs</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -5px;">25 mins</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -3px;"></p>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right"><strong>17,500.00</strong></p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right; margin-top: -3px;">--</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right; margin-top: -10px;">397.73</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right; margin-top: -8px;">(82.85)</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="border-top: solid 1px; text-align: right"><strong>17,814.88</strong></p>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-md-2" style="margin-left:20px;">
+                        <div class="row" style="margin-left:10px;">
+                            <p>SSS: </p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -8px;">Pag-Ibig:</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -8px;">PhilHealth: </p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="margin-top: -8px;">W/ Tax:</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p>Total:</p>
+                        </div>
+                        <div class="row" style="margin-left:10px; margin-top:10px;">
+                            <p><strong>NET PAY:</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right">(562.50)</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right; margin-top: -8px;">(50.00)</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right; margin-top: -8px;">(262.50)</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="text-align: right; margin-top: -8px;">(1,536.97)</p>
+                        </div>
+                        <div class="row" style="margin-left:10px;">
+                            <p style="border-top: solid 1px; text-align: right"><strong>(2,411.97)</strong></p>
+                        </div>
+                        <div class="row" style="margin-left: 10px; margin-top: 10px;">
+                            <p style="border-top: solid 1px; text-align: right"><strong>15,402.91</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+               
+            </div>
+
+
+        </div>
+    </div>
+
+</div>

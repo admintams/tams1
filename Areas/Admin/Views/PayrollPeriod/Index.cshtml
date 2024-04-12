@@ -1,0 +1,318 @@
+﻿@model PAY.Common.Entities.PayrollPeriod
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "New Employee";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Payroll Period</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        Current Period: @Session["PeriodDesc"]
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12">
+    <button type="button" class="btn btn-flat pull-right" id="btnNew" name="submit" style="margin-right:15px; margin-top: -5px;"><span class="fa fa-newspaper-o"></span> New</button>
+</div>
+
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="PayrollListContainer"></div>
+    <input type="text" id="recordId" hidden readonly />
+</div>
+
+
+<div id="InitializePopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 40%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="selectedPlan">Initialize Period</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <h3>Date : <span id="period">Payroll Period</span></h3>
+            </div>
+            <div class="modal-footer" style="text-align:left">
+                <button id="btnInitialize" type="button" class="btn btn-flat pull-right">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ComputePopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 40%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="selectedPlan">Summarize Time Entries</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <h3>Date : <span id="period2">Payroll Period</span></h3>
+            </div>
+            <div class="modal-footer" style="text-align:left">
+                <button id="btnCompute" type="button" class="btn btn-flat pull-right" >Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="SetPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 40%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="selectedPlan">Set Current Period To:</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <h3>Date : <span id="period3">Payroll Period</span></h3>
+            </div>
+            <div class="modal-footer" style="text-align:left">
+                <button id="btnSet" type="button" class="btn btn-flat pull-right">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadPayrollList();
+    });
+
+
+    $("#btnNew").click(function () {
+        $("#NewPopup").modal("show");
+    })
+
+
+    function LoadPayrollList() {
+        var ctr = 0;
+
+        $('#PayrollListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/PayrollPeriod/GetPayrollList'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                DateFrom: {
+                    title: 'Date From',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'MM dd, yy'
+                },
+                DateTo: {
+                    title: 'Date To',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'MM dd, yy'
+                },
+                PayrollDate: {
+                    title: 'Payroll Date',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'MM dd, yy'
+                },
+                IsInitialized: {
+                    title: 'Initialized',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 'true': '<input type="checkbox" checked onclick="return false" />', 'false': '<input type="checkbox" onclick="return false" />' }
+                },
+                IsClosed: {
+                    title: 'Closed',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 'true': '<input type="checkbox" checked onclick="return false" />', 'false': '<input type="checkbox" onclick="return false" />' }
+                },
+                IsLocked: {
+                    title: 'Locked',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 'true': '<input type="checkbox" checked onclick="return false" />', 'false': '<input type="checkbox" onclick="return false" />' }
+                },
+                DateInitialized: {
+                    title: 'Date Initialized',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                DateClosed: {
+                    title: 'Date Closed',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                Initialized: {
+                    title: '',
+                    width: '2%',
+                    display: function (data) {
+                        return '<button title="Initialize Period" data-target="#InitializePopup" data-toggle="modal"><i class="fa fa-snowflake-o" aria-hidden="true"></i></button> ';
+                    }
+                },
+                Compute: {
+                    title: '',
+                    width: '2%',
+                    display: function (data) {
+                        return '<button title="Compute Time Summary" data-target="#ComputePopup" data-toggle="modal"><i class="fa fa-cogs" aria-hidden="true"></i></button> ';
+                    }
+                },
+                Set: {
+                    title: '',
+                    width: '2%',
+                    display: function (data) {
+                        return '<button title="Set as Current Period" data-target="#SetPopup" data-toggle="modal"><i class="fa fa-calendar" aria-hidden="true"></i></button> ';
+                    }
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#PayrollListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+                        $("#recordId").val(record.RecordId);
+                        $("#period").text(record.Description);
+                        $("#period2").text(record.Description);
+                        $("#period3").text(record.Description);
+
+                    });
+                }
+            }
+        });
+
+        $('#PayrollListContainer').jtable('load');
+
+    }
+
+
+    $("#btnInitialize").click(function () {
+        var recId = $("#recordId").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("InitializePeriod")',
+            data: {
+                recordId: recId
+            },
+            dataType: 'json',
+            success: function (result) {
+                $("#InitializePopup").modal("hide");
+                alert("Period has been initialized.");
+
+            }
+         });
+    });
+
+    $("#btnCompute").click(function () {
+        var recId = $("#recordId").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ComputeHrs")',
+            data: {
+                recordId: recId
+            },
+            dataType: 'json',
+            success: function (result) {
+                $("#ComputePopup").modal("hide");
+                alert("Computation completed.");
+
+            }
+         });
+    });
+
+    $("#btnSet").click(function () {
+        var recId = $("#recordId").val();
+        var period = $("#period3").text();
+
+        alert(period);
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetPeriod")',
+            data: {
+                recordId: recId,
+                periodDesc: period
+            },
+            dataType: 'json',
+            success: function (result) {
+                $("#SetPopup").modal("hide");
+                alert("Period has been set.");
+
+            }
+         });
+    });
+</script>

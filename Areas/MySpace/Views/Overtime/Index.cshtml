@@ -1,0 +1,306 @@
+﻿@model PAY.Web.Models.OTRequestViewModel
+@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Overtime Request";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>My Overtime Request</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> My Overtime Request</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12">
+    <button type="button" class="btn btn-flat pull-right" id="btnNew" name="submit" style="margin-right:15px; margin-top: -5px;"><span class="fa fa-newspaper-o"></span> New</button>
+</div>
+
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="OTRequestListContainer"></div>
+    
+</div>
+
+<div id="NewPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">New Overtime Request</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            @using (Html.BeginForm("SaveOvertimeRequest", "Overtime", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="CustomerName">OT Request No:</label>
+                                    @Html.TextBoxFor(a => a.OTRequest.OTRequestNo, new { id = "lrNo", @class = "form-control", @readonly = "readonly" })
+                                </div>
+                                <div class="col-md-4 pull-right">
+                                    <label for="CustomerName">Date File:</label>
+                                    @Html.TextBoxFor(a => a.OTRequest.DateFiled, new { id = "dateFile", @class = "form-control", @readonly = "readonly" })
+                                </div>
+                                @Html.HiddenFor(a => a.OTRequest.EmpId, new { id = "empId" })
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-4">
+                                    <label for="dateFrom">Date From:</label>
+                                    @Html.TextBoxFor(a => a.OTRequest.DateFrom, new { id = "dtFrom", @class = "form-control", @type = "datetime-local" })
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="dateTo">Date To:</label>
+                                    @Html.TextBoxFor(a=> a.OTRequest.DateTo, new {id="dtTo", @class = "form-control", @type="datetime-local"})
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="hrs">Total Hrs:</label>
+                                    @Html.TextBoxFor(a => a.OTRequest.NumberOfHrs, new { id = "hrs", @class = "form-control", @readonly = "readonly" })
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-12">
+                                    <label for="remarks">Remarks:</label>
+                                    @Html.TextAreaFor(a=> a.OTRequest.Remarks, new {id="remarks", @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-6">
+
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <button type="submit" class="pull-right form-control" onclick='alert("Request has been submitted.")' id="btnSave">Save</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        $(document).ready(function () {
+            LoadOTRequestList();
+
+            var d = new Date();
+            var requestDate = ParseDate(d);
+
+            $('#dateFile').val(requestDate);
+            
+        });
+
+
+        $("#btnNew").click(function () {
+            $("#dtFrom").val("");
+            $("#dtTo").val("");
+            $("#myTable tbody").empty();
+
+            $("#NewPopup").modal("show");
+        })
+
+        function ParseDate(myDate) {
+            var now = new Date(myDate);
+            var day = ("0" + now.getDate()).slice(-2);
+            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+            var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+            return today;
+        }
+
+        function LoadOTRequestList() {
+            var ctr = 0;
+
+            $('#OTRequestListContainer').jtable({
+                title: '',
+                paging: true,
+                pageSize: 10,
+                sorting: true,
+                defaultSorting: 'Ctr ASC',
+                selecting: true,
+                selectOnRowClick: true,
+                actions: {
+                    listAction: '/MySpace/Overtime/GetOvertimeRequestByEmpId/' + $("#empId").val()
+                },
+                fields: {
+                    Ctr: {
+                        title: 'Ctr',
+                        width: '1%',
+                        visibility: 'fixed'
+                    },
+                    OTRequestNo: {
+                        title: 'Request No',
+                        width: '1%',
+                        visibility: 'fixed'
+                    },
+                    DateFiled: {
+                        title: 'Date Created',
+                        width: '3%',
+                        visibility: 'fixed',
+                        type: 'date',
+                        displayFormat: 'mm/dd/yy'
+                    },
+                    dFrom: {
+                        title: 'From',
+                        width: '7%',
+                        visibility: 'fixed'
+                    },
+                    dTo: {
+                        title: 'To',
+                        width: '7%',
+                        visibility: 'fixed'
+                    },
+                    //DateFrom: {
+                    //    title: 'From',
+                    //    width: '3%',
+                    //    visibility: 'fixed',
+                    //    type: 'date',
+                    //    displayFormat: 'mm/dd/yy'
+                    //},
+                    //DateTo: {
+                    //    title: 'To',
+                    //    width: '3%',
+                    //    visibility: 'fixed',
+                    //    type: 'date',
+                    //    displayFormat: 'mm/dd/yy'
+                    //},
+                    NumberOfHrs: {
+                        title: 'Hrs',
+                        width: '1%',
+                        visibility: 'fixed'
+                    },
+                    Remarks: {
+                        title: 'Remarks',
+                        width: '8%',
+                        visibility: 'fixed'
+                    },
+                    IsApproved: {
+                        title: 'Approved',
+                        width: '1%',
+                        visibility: 'fixed',
+                        type: 'checkbox',
+                        values: { "true": '<input type="checkbox" checked onclick="return false"/>', "false": '<input type="checkbox" onclick="return false"/>' }
+                    },
+                    ApprovedBy: {
+                        title: 'Approved By',
+                        width: '1%',
+                        visibility: 'fixed'
+                    },
+
+                },
+                selectionChanged: function () {
+                    //Get all selected rows
+                    var $selectedRows = $('#OTRequestListContainer').jtable('selectedRows');
+                    var href;
+
+                    $('#SelectedRowList').empty();
+                    if ($selectedRows.length > 0) {
+                        //Show selected rows
+                        $selectedRows.each(function () {
+                            var record = $(this).data('record');
+
+                        });
+                    }
+                }
+            });
+
+            $('#OTRequestListContainer').jtable('load');
+
+        }
+
+
+        @*$("#btnSave").click(function () {
+            var leaves = new Array();
+            var days = $("#days").val();
+
+            for (i = 0; i <=days; i++) {
+                if ($("#chk" + i).prop("checked") == false) {
+
+                    var req = {};
+                    req.RecordId = "@Guid.NewGuid()";
+                    req.EmpId = $("#empId").val();
+                    req.DateFiled = $("#dateFile").val();
+                    req.LeaveDate = $("#dt" + i).text();
+                    req.NumberOfDays = $("#dCount" + i).val();
+                    req.LeaveType = $("#leaveType" + i).val();
+                    req.Remarks = $("#remarks").val();
+                    req.LeaveRequestNo = $("#lrNo").val();
+
+                    leaves.push(req);
+                }
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SaveLeaveRequest")',
+                data: JSON.stringify(leaves),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    alert("Leave request has been submitted.");
+                    window.location.href = '@Url.Action("Index", "LeaveRequest", new { area = "MySpace" })';
+                }
+            });
+        })*@
+
+        $("#dtFrom").change(function () {
+            var t = ComputeHrs();
+            $("#hrs").val(t);
+        })
+
+        $("#dtTo").change(function () {
+            var t = ComputeHrs();
+            $("#hrs").val(t);
+        })
+
+        function ComputeHrs() {
+            var dt1 = new Date($("#dtFrom").val());
+            var dt2 = new Date($("#dtTo").val());
+
+            var diff = (dt2.getTime() - dt1.getTime()) / 1000;
+            diff /= (60 * 60);
+            return parseFloat(diff).toFixed(2);
+        }
+    </script>

@@ -1,0 +1,911 @@
+﻿@model PAY.Web.Models.EmployeeViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "New Employee";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 12px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>New Employee - <span><input type="text" id="employeeId" style="border: none; color: black; width:200px;" /></span> </b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active"> <a href='@Url.Action("Index","Employee")'>Employee List</a></li>
+        <li class="active">Employee Detail</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12">
+    @using (Html.BeginForm("SaveEmployeeDetails", "Employee", FormMethod.Post, new { Area = "AccountAdmin", enctype = "multipart/form-data", @id = "myForm" }))
+    {
+            <div class="row col-md-12" style="margin-top: 5px;">
+                <div class="col-md-1" style="top:-10px;padding-left:20px;">
+                    @if (Model.EmployeeDetail.PicturePath != null)
+                    {
+                        <img src="@Url.Content(Model.EmployeeDetail.PicturePath)" height="80" width="80" style="border: solid 2px;" id="profile">
+                    }
+                    else
+                    {
+                        <img src="/Content/images/default-user.png" height="80" width="80" style="border: solid 2px;" id="profile">
+                    }
+                    <div>
+                        <input type="file" accept="image/*" id="file" name="file" hidden />
+                    </div>
+
+                </div>
+
+                <div class="col-md-3" style="padding-left:40px;">
+                    <label for="CustomerName">Last Name:</label>
+                    @Html.TextBoxFor(a => a.EmployeeDetail.Lastname, new { id = "Lastname", @class = "form-control" })
+
+                </div>
+                <div class="col-md-3">
+                    <label for="CustomerName">First Name:</label>
+                    @Html.TextBoxFor(a => a.EmployeeDetail.Firstname, new { id = "fastname", @class = "form-control" })
+
+                </div>
+                <div class="col-md-2">
+                    <label for="CustomerName">Middle Name:</label>
+                    @Html.TextBoxFor(a => a.EmployeeDetail.Middlename, new { id = "mastname", @class = "form-control" })
+
+                </div>
+                <div class="col-md-1">
+                    <label for="CustomerName">Suffix :</label>
+                    @Html.TextBoxFor(a => a.EmployeeDetail.Suffix, new { id = "Suffix", @class = "form-control" })
+                </div>
+
+                <div class="col-md-2">
+                    <label for="CustomerName">Status </label>
+                    @Html.DropDownListFor(m => m.EmployeeDetail.EmploymentStatus, new SelectList(Model.StatusList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "status" })
+                </div>
+
+                @Html.HiddenFor(a=> a.EmployeeDetail.EmpID, new {id = "empID"})
+                @Html.HiddenFor(a => a.EditMode)
+                @Html.HiddenFor(a => a.PicturePath)
+                @Html.HiddenFor(a=> a.EmployeeDetail.Restday, new {id="restday"})
+                @Html.HiddenFor(a=> a.IdPrefix, new { id="idprefix"})
+                
+            </div>
+
+            <div class="col-md-12 row">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs pull-right">
+                        <li class=""><a href="#tab_1-1" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Loan Request</a></li>
+                        <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Overtime Request</a></li>
+                        <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Leave Request</a></li>
+                        <li class=""><a href="#tab_5-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Tax / Benefits</a></li>
+                        <li class="active"><a href="#tab_4-2" data-toggle="tab" aria-expanded="true" style="padding-left:7px; padding-right:7px;">Basic Information</a></li>
+                        <li class="pull-left header"><i class="fa fa-th"></i>Employee Details</li>
+                    </ul>
+                    <div class="tab-content" style="padding:20px;">
+                        <div class="tab-pane" id="tab_1-1" style="margin:10px;">
+                            <div class="row">
+                                <label for="name">Check if applicable:</label>
+                            </div>
+
+
+                        </div>
+
+                        <div class="tab-pane" id="tab_2-2" style="height:600px;">
+                            <div class="col-md-12" style="margin-top: 10px;">
+                                <div id="OTRequestListContainer"></div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab_3-2" style="height:600px;">
+                            <div class="col-md-12" style="margin-top: 10px;">
+                                <div id="LeaveRequestListContainer"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane" id="tab_5-2" style="height:600px;">
+                            <div>
+                                <button class="pull-right" style="margin-right:13px;" id="btnNew" type="button">New Benefit</button>
+                            </div>
+                            <div class="col-md-12" style="margin-top: 10px;">
+                                <div id="BenefitListContainer"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane active" id="tab_4-2" style="height:560px;">
+                            <div class="row col-md-12" style="margin-left:10px; margin-top:7px;">
+                                <div class="row">
+                                    <div class="col-md-9 pull-left">
+                                        <div class="col-md-4">
+                                            <label for="Position">Position </label>
+                                            @Html.DropDownListFor(m => m.EmployeeDetail.Position, new SelectList(Model.PositionList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "position" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Designation </label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.Designation, new { id = "Designation", @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Department </label>
+                                            @Html.DropDownListFor(m => m.EmployeeDetail.Department, new SelectList(Model.DepartmentList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "department" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3 pull-right">
+                                        <div class="tbl-containerx">
+                                            <table id="myCommonTable">
+                                                <thead class="header">
+                                                    <tr>
+                                                        <th style="width:45%">Leave Credits</th>
+                                                        <th style="width:5%">Value</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="fixed-tbl">
+                                                    <tr>
+                                                        <td>
+                                                            Service Incentive Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.SIL, new { id = "SIL", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="width:150px;">
+                                                            Vacation Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.VL, new { id = "VL", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Sick Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.SL, new { id = "SL", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Paternity Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.PL, new { id = "PL", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Maternity Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.ML, new { id = "ML", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            Single Parent Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.SPL, new { id = "SPL", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td>
+                                                            Bereavement Leave
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.BRL, new { id = "BRL", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+
+
+
+                                                    <tr>
+                                                        <td>
+                                                            Offset
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.EmployeeDetail.Offset, new { id = "offset", @class = "rowStyle", @style = "width: 50px;" })
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top:-215px;">
+                                    <div class="col-md-9 pull-left">
+                                        <div class="col-md-4">
+                                            <label for="DateHired ">Date Hired </label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.DateHired, "{0:yyyy-MM-dd}", new { id = "dateHired", @class = "form-control", @type = "date" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Tenure </label>
+                                            @Html.DropDownListFor(m => m.EmployeeDetail.EmploymentType, new SelectList(Model.EmploymentTypeList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "tenure" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Payroll Terms </label>
+                                            @Html.DropDownListFor(m => m.EmployeeDetail.PayrollTerms, new SelectList(Model.TermsList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "terms" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="margin-top:-125px;">
+                                    <div class="col-md-9 pull-left">
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Basic Pay </label>
+                                            <input type="text" id="strBasicPay" class = "form-control" />
+                                            @Html.HiddenFor(a=> a.EmployeeDetail.BasicPay, new { id = "BasicPay" })
+
+                                             @*@Html.TextBoxFor(a => a.EmployeeDetail.BasicPay, new { id = "BasicPay", @class = "form-control" })*@
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Shift </label>
+                                            @Html.DropDownListFor(m => m.EmployeeDetail.ShiftCode, new SelectList(Model.ShiftList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "shift" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Marital Status</label>
+                                            @Html.DropDownListFor(m => m.EmployeeDetail.MaritalStatus, new SelectList(Model.MaritalStatusList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color#e7eaeb;", id = "terms" })
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row" style="margin-top:-40px;">
+                                    <dv class="col-md-9 pull-left">
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">SSS </label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.SSSNo, new { id = "SSSNo", @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">PAG-IBIG </label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.PagIbigNo, new { id = "PagIbigNo", @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">TIN </label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.TIN, new { id = "TIN", @class = "form-control" })
+                                        </div>
+                                    </dv>
+                                </div>
+
+                                <div class="row" style="margin-top:30px;">
+                                    <div class="col-md-9 pull-left">
+                                        <div class="col-md-4">
+                                            <label for="DateHired ">Regularization Date</label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.RegularizationDate, "{0:yyyy-MM-dd}", new { id = "regularizationDate", @class = "form-control", @type = "date" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Grace Period</label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.GracePeriod, new { id = "GracePeriod", @class = "form-control" })
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="CustomerName">Inactive Date </label>
+                                            @Html.TextBoxFor(a => a.EmployeeDetail.InactiveDate, new { id = "inactiveDate", @class = "form-control" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="approver">Approver</label>
+                                        @Html.DropDownListFor(m => m.EmployeeDetail.Approver, new SelectList(Model.ApproverList, "EmpID", "Lastname"), "[Select]", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "status" })
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row col-md-12" style="margin-left:10px; margin-top:25px;">
+                                <div class="col-md-3">
+                                    <label for="location">Location</label>
+                                    @Html.DropDownListFor(m => m.EmployeeDetail.Location, new SelectList(Model.LocationList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:300px;background-color#e7eaeb;", id = "location" })
+                                </div>
+
+                                <div class="col-md-9">
+                                    <div style="margin-top:30px;">
+                                        <label for="CustomerName">Restday: </label>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="mon" /> <span style="font-size:13px;"><u>Monday</u></span>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="tue" /> <span style="font-size:13px;"><u>Tuesday</u></span>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="wed" /> <span style="font-size:13px;"><u>Wednesday</u></span>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="thu" /> <span style="font-size:13px;"><u>Thursday</u></span>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="fri" /> <span style="font-size:13px;"><u>Friday</u></span>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="sat" /> <span style="font-size:13px;"><u>Saturday</u></span>
+                                        <input type="checkbox" style="margin-left:17px;font-size:15px;" id="sun" /> <span style="font-size:13px;"><u>Sunday</u></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row col-md-12" style="margin-left:10px; margin-top:15px;">
+                                <button type="submit" class="btn btn-flat pull-right " id="btnSave" name="submit"><span class="fa fa-save"></span> Save </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+    }
+
+</div>
+
+
+<div id="NewPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">New Benefit</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            @using (Html.BeginForm("SaveBenefit", "Employee", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="tbl-containerx">
+                                <table id="myTable">
+                                    <thead class="header">
+                                        <tr>
+                                            <th style="width:20%;">Field</th>
+                                            <th style="width:40%;">Value <button id="btnSaveBenefit" type="submit" class="btn btn-flat pull-right">Save</button></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fixed-tbl">
+                                        <tr>
+                                            <td>
+                                                Account Id
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m=> m.EmpBenefit.AccountId , new {@id = "accountId", @style= "width:300px;", @class = "rowStyle" , @readonly="readonly"})
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Description
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(m=> m.EmpBenefit.Description, new SelectList(Model.BenefitList, "AccountId", "Description"), "[Select]", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "acctDesc" })
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Pay Period
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(m=> m.EmpBenefit.PayPeriod, new List<SelectListItem> {new SelectListItem() {Text = "1st Pay", Value="1"},
+                                                                                                                         new SelectListItem() {Text = "2nd Pay", Value="2"},
+                                                                                                                         new SelectListItem() {Text = "1st Pay & 2nd Pay", Value="3"}}, "[Select]", new { @class = "form-control", @style = "width:300px;background-color:#e7eaeb;", id = "acctDesc" })
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Amount
+                                            </td>
+                                            <td>
+                                                <input type="text" id="strAmount" style="width:150px;" , class="rowStyle" /> per Month
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                @Html.HiddenFor(m=> m.EmpBenefit.EmpID)
+                                @Html.HiddenFor(m=> m.EmpBenefit.Amount)
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+    
+<script>
+    $(document).ready(function () {
+        var empId = $("#empID").val();
+        var pre = $("#idprefix").val();
+
+        $("#employeeId").val(pre + empId);
+
+        var amt = parseFloat($("#BasicPay").val());
+        $("#strBasicPay").val(addCommas(amt.toFixed(2)));
+
+        LoadLeaveRequestList();
+        LoadOTRequestList();
+        LoadEmployeeBenefits();
+
+        var rd = $("#restday").val();
+        let days = rd.split(",");
+
+        for (let i = 0; i < days.length; i++) {
+
+            switch (days[i]) {
+                case "1":
+                    $('#mon').prop('checked', true);
+                    break;
+                case "2":
+                    $('#tue').prop('checked', true);
+                    break;
+                case "3":
+                    $('#wed').prop('checked', true);
+                    break;
+                case "4":
+                    $('#thu').prop('checked', true);
+                    break;
+                case "5":
+                    $('#fri').prop('checked', true);
+                    break;
+                case "6":
+                    $('#sat').prop('checked', true);
+                    break;
+                case "7":
+                    $('#sun').prop('checked', true);
+                    break;
+            }
+        }
+    });
+
+    $("#profile").on("click", function () {
+        $('#file').trigger('click');
+    });
+
+
+    $("#btnSave").click(function (e) {
+        var rd = "";
+
+        if ($("#mon").is(':checked') == true) {
+            rd = rd + "1,";
+        }
+
+        if ($("#tue").is(':checked') == true) {
+            rd = rd + "2,";
+        }
+
+        if ($("#wed").is(':checked') == true) {
+            rd = rd + "3,";
+        }
+
+        if ($("#thu").is(':checked') == true) {
+            rd = rd + "4,";
+        }
+
+        if ($("#fri").is(':checked') == true) {
+            rd = rd + "5,";
+        }
+
+        if ($("#sat").is(':checked') == true) {
+            rd = rd + "6,";
+        }
+
+        if ($("#sun").is(':checked') == true) {
+            rd = rd + "7,";
+        }
+
+        $("#restday").val(rd);
+
+        alert("Record has been saved.");
+
+    });
+
+
+    var uploadField = document.getElementById("file");
+
+    uploadField.onchange = function () {
+        if (this.files[0].size > 4000000) {
+            $('#UploadFailed').modal('show');
+            setTimeout(function () {
+                $('#UploadFailed').modal('hide');
+            }, 2500);
+        } else {
+            readURLProfile(this);
+        };
+    };
+
+    function readURLProfile(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#profile').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+            GetFileNameProfile();
+        }
+    }
+
+    function GetFileNameProfile() {
+        var fileInput = document.getElementById('file');
+        var fileName = fileInput.value.split(/(\\|\/)/g).pop();
+
+        // $("#profile").val(fileName);
+    }
+
+    function addCommas(x) {
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    }
+
+    $("#strAmount").change(function () {
+        var amt = parseFloat($("#strAmount").val().replace(',', ''));
+
+        if (amt == null) {
+            alert("Invalid amount.");
+            e.preventDefault();
+        }
+
+        if (isNaN(amt) == true) {
+            alert("Invalid amount.");
+            e.preventDefault();
+        }
+        else {
+            if (amt <= 0) {
+                alert("Amount paid must not be a negative or zero value.");
+                e.preventDefault();
+            }
+            else {
+                $("#strAmount").val(addCommas(amt.toFixed(2)));
+                $("#amount").val(amt);
+            }
+        }
+
+    })
+
+    $("#strBasicPay").change(function () {
+        var amt = parseFloat($("#strBasicPay").val().replace(',', ''));
+
+        if (amt == null) {
+            alert("Invalid amount.");
+            e.preventDefault();
+        }
+
+        if (isNaN(amt) == true) {
+            alert("Invalid amount.");
+            e.preventDefault();
+        }
+        else {
+            if (amt <= 0) {
+                alert("Amount paid must not be a negative or zero value.");
+                e.preventDefault();
+            }
+            else {
+                $("#strBasicPay").val(addCommas(amt.toFixed(2)));
+                $("#BasicPay").val(amt);
+            }
+        }
+
+    })
+
+    function LoadLeaveRequestList() {
+        var ctr = 0;
+
+        $('#LeaveRequestListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/LeaveRequest/GetLeaveRequestByEmpId/' + $("#empID").val()
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '2%',
+                    visibility: 'fixed'
+                },
+                DateFiled: {
+                    title: 'Date Filed',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                DateFrom: {
+                    title: 'Date From',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                DateTo: {
+                    title: 'Date To',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                NumberOfDays: {
+                    title: 'No Of Days',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Remarks: {
+                    title: 'Remarks',
+                    width: '6%',
+                    visibility: 'fixed'
+                },
+                PaidLeaves: {
+                    title: 'Paid Leaves',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                IsApproved: {
+                    title: 'Approved',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                ApprovedBy: {
+                    title: 'Approved By',
+                    width: '6%',
+                    visibility: 'fixed'
+                },
+
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#LeaveRequestListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#LeaveRequestListContainer').jtable('load');
+
+    }
+
+
+    function LoadOTRequestList() {
+        var ctr = 0;
+
+        $('#OTRequestListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/OvertimeRequest/GetOvertimeRequestByEmpId/' + $("#empID").val()
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '2%',
+                    visibility: 'fixed'
+                },
+                DateFiled: {
+                    title: 'Date Filed',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                DateFrom: {
+                    title: 'Date From',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                DateTo: {
+                    title: 'Date To',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                NumberOfHrs: {
+                    title: 'No Of Hrs',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Remarks: {
+                    title: 'Remarks',
+                    width: '6%',
+                    visibility: 'fixed'
+                },
+                IsApproved: {
+                    title: 'Approved',
+                    width: '1%',
+                    visibility: 'fixed'
+                },
+                ApprovedBy: {
+                    title: 'Approved By',
+                    width: '6%',
+                    visibility: 'fixed'
+                },
+                ApprovalDate: {
+                    title: 'Approval Date',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#OTRequestListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#OTRequestListContainer').jtable('load');
+
+    }
+
+
+    function LoadEmployeeBenefits() {
+        var ctr = 0;
+
+        $('#BenefitListContainer').jtable({
+            title: '',
+            //paging: true,
+            //pageSize: 10,
+            //sorting: true,
+            //defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Employee/LoadEmployeeBenefits/' + $("#empID").val()
+            },
+            fields: {
+                Ctr: {
+                    title: '',
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                AccountId: {
+                    title: 'AccountId',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                AccountName: {
+                    title: 'Account Name',
+                    width: '15%',
+                    visibility: 'fixed'
+                },
+                IsMandatory: {
+                    title: 'Mandatory',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 'true': '<input type="checkbox" checked onclick="return false" />', 'false': '<input type="checkbox" onclick="return false"/>' }
+                },
+                PayPeriod: {
+                    title: 'Pay Period',
+                    width: '10%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { '1': '1st', '2': '2nd', '3':'1st & 2nd' }
+                },
+                Amount: {
+                    title: 'Amount',
+                    width: '6%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="text-align: right;">' + addCommas(data.record.Amount.toFixed(2)) + '</p>';
+                    }
+                },
+                Edit: {
+                    title: '',
+                    width: '4%',
+                    display: function (data) {
+                        return '<button title="Edit this record." data-target="#TimecardPopup" data-toggle="modal" id="delete"><i class="fa fa-edit" aria-hidden="true"></i></button> ';
+                    }
+                },
+                Delete: {
+                    title: '',
+                    width: '4%',
+                    display: function (data) {
+                        return '<button title="Delete this record." data-target="#TimecardPopup" data-toggle="modal" id="delete"><i class="fa fa-trash" aria-hidden="true"></i></button> ';
+                    }
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#BenefitListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#BenefitListContainer').jtable('load');
+
+    }
+
+    $("#location").change(function () {
+        var p = $(this).val();
+        $("#idprefix").val(p);
+
+        var empId = $("#empID").val();
+        var pre = p;
+
+        $("#employeeId").val(pre + empId);
+    });
+
+    $("#btnNew").click(function () {
+        $("#NewPopup").modal("show");
+    })
+
+
+    $("#acctDesc").change(function () {
+        var p = $(this).val();
+        $("#accountId").val(p);
+       
+    });
+</script>

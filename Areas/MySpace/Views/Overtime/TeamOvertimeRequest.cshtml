@@ -1,0 +1,301 @@
+﻿@model PAY.Web.Models.HolidayViewModel
+@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Team Overtime Request";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Team Overtime Request</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> Team Overtime Request </li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="OTListContainer"></div>
+</div>
+
+
+<div id="EditPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">Overtime Request Approval</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            @using (Html.BeginForm("SaveOvertimeRequest", "Overtime", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="requestNo">OT Request No:</label>
+                                    <input type="text" readonly id="otNo" class="form-control" />
+                                </div>
+                                <div class="col-md-4 pull-right">
+                                    <label for="CustomerName">Date File:</label>
+                                    <input type="text" id="dateFile" class="form-control" readonly />
+
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-4">
+                                    <label for="dateFrom">Date From:</label>
+                                    @*@Html.TextBoxFor(a => a.OTRequest.DateFrom, new { id = "dtFrom", @class = "form-control", @type = "datetime-local" })*@
+                                    <input type="text" id="dtFrom" class="form-control" readonly />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="dateTo">Date To:</label>
+                                    @*@Html.TextBoxFor(a => a.OTRequest.DateTo, new { id = "dtTo", @class = "form-control", @type = "datetime-local" })*@
+                                    <input type="text" id="dtTo" class="form-control" readonly />
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="hrs">Total Hrs:</label>
+                                    @*@Html.TextBoxFor(a => a.OTRequest.NumberOfHrs, new { id = "hrs", @class = "form-control", @readonly = "readonly" })*@
+                                    <input type="text" id="hrs" class="form-control" readonly />
+
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-12">
+                                    <label for="remarks">Remarks:</label>
+                                    @*@Html.TextAreaFor(a => a.OTRequest.Remarks, new { id = "remarks", @class = "form-control" })*@
+                                    <textarea id="remarks" class="form-control" readonly></textarea>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-8">
+                                    <label for="note">Approval Note</label>
+                                    <input type="text" id="note" class="form-control" />
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <label for="approval">Approval</label>
+                                    <select id="approval" class="form-control">
+                                        <option>[Select]</option>
+                                        <option value=1>Approved</option>
+                                        <option value=0>Disapproved</option>
+                                        <option value=2>Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-6">
+
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <button type="button" class="btn btn-flat pull-right " id="btnSave" name="submit"><span class="fa fa-save"></span> Save </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadTeamOTRequest();
+    });
+
+
+    function LoadTeamOTRequest() {
+        var ctr = 0;
+
+        $('#OTListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/MySpace/Overtime/GetTeamOvertimeRequest'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                OTRequestNo: {
+                    title: 'Request No',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<a title="Overtime Details"  href="#" onclick="GetOvertimeDetails();">' + data.record.OTRequestNo + "</a>";
+                    }
+                },
+                //EmpId: {
+                //    title: 'Emp ID',
+                //    width: '3%',
+                //    visibility: 'fixed',
+                //},
+                FullName: {
+                    title: 'Name',
+                    width: '12%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '[' + data.record.EmpId + '] - ' + data.record.FullName;
+                    }
+                },
+                DateFiled: {
+                    title: 'Request Date',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm-dd-yy'
+                },
+                dFrom: {
+                    title: 'From',
+                    width: '10%',
+                    visibility: 'fixed',
+                },
+                dTo: {
+                    title: 'To',
+                    width: '10%',
+                    visibility: 'fixed',
+                },
+                NumberOfHrs: {
+                    title: 'Hrs',
+                    width: '1%',
+                    visibility: 'fixed',
+                },
+                Remarks: {
+                    title: 'Remarks',
+                    width: '15%',
+                    visibility: 'fixed',
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#OTListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+                        $("#otNo").val(record.OTRequestNo);
+
+                    });
+                }
+            }
+        });
+
+        $('#OTListContainer').jtable('load');
+
+    }
+
+
+    function GetOvertimeDetails() {
+        var otNo = $("#otNo").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetOvertimeDetails")',
+            data: { otNo: otNo },
+            dataType: 'json',
+            success: function (result) {
+                var pattern = /Date\(([^)]+)\)/;
+
+                var fDate = pattern.exec(result.DateFiled);
+                var fiDate = new Date(parseFloat(fDate[1]));
+                var fileDate = (fiDate.getMonth() + 1) + "/" + fiDate.getDate() + "/" + fiDate.getFullYear();
+
+                $("#dateFile").val(fileDate);
+                $("#dtFrom").val(result.dFrom);
+                $("#dtTo").val(result.dTo);
+                $("#remarks").val(result.Remarks);
+                $("#hrs").val(result.NumberOfHrs);
+
+                $("#EditPopup").modal("show");
+            },
+        });
+    }
+
+
+    function ParseDate(myDate) {
+        var now = new Date(myDate);
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+        return today;
+    }
+
+    $("#btnSave").click(function () {
+        var otNo = $("#otNo").val();
+        var note = $("#note").val();
+        var app = $('#approval').find(":selected").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveApproval")',
+            data: {
+                otNo: otNo,
+                note: note,
+                approval: app
+            },
+            dataType: 'json',
+            success: function (result) {
+                $("#EditPopup").modal("hide");
+                $('#OTListContainer').jtable('reload');
+                alert("Reocrd has been saved.");
+
+            }
+         });
+    });
+
+</script>

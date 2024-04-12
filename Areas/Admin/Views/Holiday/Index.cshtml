@@ -1,0 +1,225 @@
+﻿@model PAY.Web.Models.HolidayViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "New Employee";
+}
+
+<link rel="stylesheet" href="~/plugins/bower_components/select2/dist/css/select2.min.css">
+<script src="~/plugins/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Holiday List </b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active"> Holiday List</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12">
+    <button type="button" class="btn btn-flat pull-right" id="btnNew" name="submit" style="margin-right:15px; margin-top: -5px;"><span class="fa fa-newspaper-o"></span> New</button>
+</div>
+
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="HolidayListContainer"></div>
+</div>
+
+
+
+<div id="NewPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">Define New Holiday</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            @using (Html.BeginForm("SaveHoliday", "Holiday", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="tbl-containerx">
+                                <table id="myCommonTable">
+                                    <thead class="header">
+                                        <tr>
+                                            <th style="width:20%;">Field</th>
+                                            <th style="width:40%;">Value <button id="btnSave" type="submit" class="btn btn-flat pull-right">Save</button></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fixed-tbl">
+                                        <tr>
+                                            <td>
+                                                Date of Holiday
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Holiday.HolidayDate, new { id = "holidate", @style = "width:160px;", @type = "date", @class = "rowStyle" })
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Holiday Type
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(m => m.Holiday.HolidayType, new SelectList(Model.HolidayTypeList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:160px;background-color:#e7eaeb;", id = "department" })
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Description
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.Holiday.Description, new { id = "holidate", @style = "width:300px;", @class = "rowStyle" })
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                Applicable To
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(m => m.Holiday.ApplicableTo, new SelectList(Model.LocationList, "Code", "Description"), "Select", new { @class = "form-control", @style = "width:250px;background-color:#e7eaeb;", id = "location" })
+                                                
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+
+                                @Html.HiddenFor(m => m.Holiday.RecordId, new { id = "recordId" })
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadHolidayList();
+    });
+
+
+    $("#btnNew").click(function () {
+        $("#NewPopup").modal("show");
+    })
+
+
+    function LoadHolidayList() {
+        var ctr = 0;
+
+        $('#HolidayListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Holiday/GetHolidayList'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                HolidayDate: {
+                    title: 'Date of Holiday',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'MM dd, yy'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '13%',
+                    visibility: 'fixed',
+                },
+                Year: {
+                    title: 'Year',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                HolidayType: {
+                    title: 'Type',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                ApplicableTo: {
+                    title: 'Applicable To',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#HolidayListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#HolidayListContainer').jtable('load');
+
+    }
+
+</script>

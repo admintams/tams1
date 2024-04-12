@@ -1,0 +1,131 @@
+﻿@model PAY.Web.Models.HolidayViewModel
+@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "New Employee";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Holiday List </b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> Holiday List</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="HolidayListContainer"></div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadHolidayList();
+    });
+
+
+    function LoadHolidayList() {
+        var ctr = 0;
+
+        $('#HolidayListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Holiday/GetHolidayList'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                HolidayDate: {
+                    title: 'Date of Holiday',
+                    width: '7%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'MM dd, yy'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '13%',
+                    visibility: 'fixed',
+                },
+                Year: {
+                    title: 'Year',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                HolidayType: {
+                    title: 'Type',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                ApplicableTo: {
+                    title: 'Applicable To',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#HolidayListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#HolidayListContainer').jtable('load');
+
+    }
+
+</script>

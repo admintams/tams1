@@ -1,0 +1,181 @@
+﻿@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Time Log";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+
+    .buttonStart {
+        background-color: #28a745;
+        border-radius: 2rem;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+    }
+
+    .buttonEnd {
+        background-color: #dc3545;
+        border-radius: 2rem;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Time Log </b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> Time Log</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-1" style="margin-left:20px;">
+
+</div>
+
+<div class="col-md-6" style="margin-left:20px;">
+    <div class="box box-info">
+        <div class="box-header with-border" style="padding-bottom:0px">
+            <strong><p style="font-size:x-large" id="today"></p></strong>
+            <div id="clock" style="font-size:x-large">8:10:45</div>
+        </div>
+        <div class="box-body" style="padding-top:50px;">
+            <div class="row">
+                <div class="col-md-2">
+
+                </div>
+
+                <div class="col-md-3">
+                    <button type="button" id="timeIn" class="buttonStart" onclick="SaveTimeRecord('IN');">Time IN </button>
+                </div>
+
+                <div class="col-md-1">
+
+                </div>
+
+                <div class="col-md-3">
+                    <button type="button" id="timeOut" class="buttonEnd" onclick="SaveTimeRecord('OUT');">Time OUT</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer" style="text-align:left">
+            <p id="remarks" sty></p>
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    setInterval(showTime, 1000);
+
+    function showTime() {
+        let time = new Date();
+        let hour = time.getHours();
+        let min = time.getMinutes();
+        let sec = time.getSeconds();
+        am_pm = "AM";
+
+        if (hour > 12) {
+            hour -= 12;
+            am_pm = "PM";
+        }
+        if (hour == 0) {
+            hr = 12;
+            am_pm = "AM";
+        }
+
+        hour = hour < 10 ? "0" + hour : hour;
+        min = min < 10 ? "0" + min : min;
+        sec = sec < 10 ? "0" + sec : sec;
+
+        let currentTime = hour + ":"
+            + min + ":" + sec + am_pm;
+
+        document.getElementById("clock")
+            .innerHTML = currentTime;
+
+
+        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        var d = new Date();
+        $("#today").text(d.toLocaleDateString("en-US", options));
+    }
+
+    showTime();
+
+    function ParseDate(myDate) {
+        var now = new Date(myDate);
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+        return today;
+    }
+
+    function SaveTimeRecord(logType) {
+        var tm = $("#clock").text();
+        var d = new Date($("#today").text());
+        var dte = ParseDate(d);
+
+         $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveTimeRecord")',
+             data: {
+                 logType: logType,
+                 t: tm,
+                 dte:dte
+             },
+            dataType: 'json',
+             success: function (result) {
+                 if (result.Message = "SUCCESS") {
+                     $("#remarks").text("Time logging is successful. Recorded time is " + dte + " " + tm);
+                     $("#remarks").css({ "color": "blue" });
+                 }
+                 else {
+                     $("#remarks").text("Time Logging failed. Please refresh the page or contact the administrator");
+                     $("#remarks").css({ "color": "red" });
+                 }
+            },
+         });
+    }
+</script>

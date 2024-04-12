@@ -1,0 +1,489 @@
+﻿@model PAY.Web.Models.PayAdjustmentViewModel
+@{
+    ViewBag.Title = "PayAdjustment";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Payroll Adjustment</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        Current Period: @Session["PeriodDesc"]
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <span class="text-bold" style="margin-left: 15px;">Search: </span>
+        <select name="field" id="field" class="margin-r-5" style="width: 200px;">
+            <option value="itemcode">Employee Id</option>
+            <option value="itemname">Lastname</option>
+            <option value="itemname">Firstname</option>
+        </select>
+        <span> <input type="text" name="itemCode" id="itemCode" placeholder="Enter your search here..." /></span>
+
+        <button type="button" class="btn btn-flat pull-right" id="btnNew" name="submit" style="margin-right:15px; margin-top: -5px;"><span class="fa fa-user"></span> New </button>
+    </div>
+</div>
+
+<div class="col-md-12" style="margin-top: 10px;">
+    <div id="EmployeeListContainer"></div>
+</div>
+
+<div class="col-md-12" style="margin-top: 10px;">
+    <div id="AdjustmentListContainer"></div>
+</div>
+
+
+<div id="NewPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">Payroll Adjustment</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            @using (Html.BeginForm("SaveAdjustment", "PayrollAdjustment", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="tbl-containerx">
+                                <table id="myTable">
+                                    <thead class="header">
+                                        <tr>
+                                            <th style="width:20%;">Field</th>
+                                            <th style="width:40%;">Value <button id="btnSaveAdjustment" type="submit" class="btn btn-flat pull-right">Save</button></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fixed-tbl">
+                                        <tr>
+                                            <td>
+                                                Employee
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.PayAdjustment.EmpName, new { @id = "empName", @style = "width:350px;", @class = "rowStyle", @readonly = "readonly" })
+                                                <button type="button" class="fa fa-binoculars" id="searchEmp"></button>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Account Id
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.PayAdjustment.AccountID, new { @id = "accountId", @style = "width:350px;", @class = "rowStyle", @readonly = "readonly" })
+                                                <button type="button" class="fa fa-binoculars" id="searchAcct"></button>
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Description
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.PayAdjustment.Description, new { @id = "acctDesc", @style = "width:350px;", @class = "rowStyle", @readonly = "readonly" })
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Amount
+                                            </td>
+                                            <td>
+                                                <input type="text" id="strAmount" style="width:150px;" , class="rowStyle" />
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                Remarks
+                                            </td>
+                                            <td>
+                                                @Html.TextAreaFor(m=> m.PayAdjustment.Remarks, new { id = "remarks", @style = "width:350px;" })
+                                            </td>
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                                @Html.HiddenFor(m => m.PayAdjustment.EmpID, new { id = "empId" })
+                                @Html.HiddenFor(m=> m.PayAdjustment.AccountName, new {id="acctName"})
+                                @Html.HiddenFor(m => m.PayAdjustment.PayrollPeriod)
+                                @Html.HiddenFor(m => m.PayAdjustment.Amount, new { id = "amount" })
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+
+<div id="EmployeePopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 70%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="selectedId">Select Employee</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-row txt-highlight">
+                    <div class="form-group col-md-7">
+                        <label for="CustomerName">Employee Name:</label>
+                        <input type="text" id="empNameSelected" readonly placeholder="Employee Name" class="form-control" />
+                    </div>
+
+                    <div class="form-group col-md-5">
+                        <label for="Name">Search Employee</label>
+                        <input type="text" id="myEmpInput" placeholder="Search for names.." class="form-control">
+                    </div>
+                </div>
+                <input type="text" id="empIdSelected" readonly hidden />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="tbl-container">
+                            <table id="myCustTable">
+                                <thead class="header">
+                                    <tr>
+                                        <th style="width:20%;">Emp Id</th>
+                                        <th style="width:30%;">Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fixed-tbl">
+                                    @{ var items = Model.EmployeeList;}
+                                    @for (int i = 0; i < items.Count(); i++)
+                                    {
+                                        <tr>
+                                            <td class="empId">
+                                                @items[i].EmpID
+                                            </td>
+                                            <td class="empName">
+                                                @items[i].Lastname, @items[i].Firstname
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:left">
+                <button id="btnSelect" type="button" class="btn btn-flat pull-right">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="AccountPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 70%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="selectedAcctId">Select Account</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-row txt-highlight">
+                    <div class="form-group col-md-7">
+                        <label for="CustomerName">Accout Name:</label>
+                        <input type="text" id="acctNameSelected" readonly placeholder="Employee Name" class="form-control" />
+                    </div>
+
+                    <div class="form-group col-md-5">
+                        <label for="Name">Search Employee</label>
+                        <input type="text" id="myAcctInput" placeholder="Search for names.." class="form-control">
+                    </div>
+                </div>
+                <input type="text" id="acctIdSelected" readonly hidden />
+                <input type="text" id="acctDescSelected" readonly hidden />
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="tbl-container">
+                            <table id="myCommonTable">
+                                <thead class="header">
+                                    <tr>
+                                        <th style="width:20%;">Account Id</th>
+                                        <th style="width:30%;">Account Name</th>
+                                        <th style="width:30%;">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fixed-tbl">
+                                    @{ var acctItems = Model.PayAccountList;}
+                                    @for (int i = 0; i < acctItems.Count(); i++)
+                                    {
+                                        <tr>
+                                            <td class="acctId">
+                                                @acctItems[i].AccountId
+                                            </td>
+                                            <td class="acctName">
+                                                @acctItems[i].AccountName
+                                            </td>
+                                            <td class="acctDesc">
+                                                @acctItems[i].Description
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="text-align:left">
+                <button id="btnAcctSelect" type="button" class="btn btn-flat pull-right">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        LoadAdjustmentList();
+
+        $("#myEmpInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#myCustTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        $("#myAcctInput").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#myCommonTable tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+
+    function addCommas(x) {
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    }
+
+    $("#btnNew").click(function () {
+        $("#NewPopup").modal("show");
+    })
+
+    $("#searchEmp").click(function () {
+        $("#empIdSelected").val('');
+        $("#empNameSelected").val('');
+        $("#myEmpInput").val('');
+        $("#selectedAcctId").text('Select Customer');
+
+        var $rows = $('#myCustTable tr');
+        $rows.show();
+
+        $("#EmployeePopup").modal("show");
+    });
+
+    $("#searchAcct").click(function () {
+        $("#acctIdSelected").val('');
+        $("#acctNameSelected").val('');
+        $("#acctDescSelected").val('');
+        $("#myAcctInput").val('');
+        $("#selectedAcctId").text('Select Customer');
+
+        var $rows = $('#myCommonTable tr');
+        $rows.show();
+
+        $("#AccountPopup").modal("show");
+    });
+
+    $("#btnSelect").click(function () {
+        $("#empId").val($("#empIdSelected").val());
+        $("#empName").val($("#empNameSelected").val());
+
+        $("#EmployeePopup").modal("hide");
+        $("#NewPopup").focus();
+    });
+
+    $("#btnAcctSelect").click(function () {
+        $("#accountId").val($("#acctIdSelected").val());
+        $("#acctDesc").val($("#acctDescSelected").val());
+        $("#acctName").val($("#acctNameSelected").val());
+
+        $("#AccountPopup").modal("hide");
+        $("#NewPopup").focus();
+    });
+
+
+    $("#myCustTable tr").click(function () {
+        $(this).addClass('selected').siblings().removeClass('selected');
+        var value = $(this).find('td:first').html();
+
+        $("#empIdSelected").val(value.trim());
+        $("#selectedId").text("Select Employee - [" + value + "]");
+
+        var name = $(this).closest("tr").find('td.empName').text();
+        $("#empNameSelected").val(name.trim());
+
+    });
+
+    $("#myCommonTable tr").click(function () {
+        $(this).addClass('selected').siblings().removeClass('selected');
+        var value = $(this).find('td:first').html();
+
+        $("#acctIdSelected").val(value.trim());
+        $("#selectedAcctId").text("Select Employee - [" + value + "]");
+
+        var name = $(this).closest("tr").find('td.acctName').text();
+        $("#acctNameSelected").val(name.trim());
+
+        var desc = $(this).closest("tr").find('td.acctDesc').text();
+        $("#acctDescSelected").val(desc.trim());
+
+    });
+
+    $("#strAmount").change(function () {
+        var amt = parseFloat($("#strAmount").val().replace(',', ''));
+
+        if (amt == null) {
+            alert("Invalid amount.");
+            e.preventDefault();
+        }
+
+        if (isNaN(amt) == true) {
+            alert("Invalid amount.");
+            e.preventDefault();
+        }
+        else {
+            if (amt <= 0) {
+                alert("Amount paid must not be a negative or zero value.");
+                e.preventDefault();
+            }
+            else {
+                $("#strAmount").val(addCommas(amt.toFixed(2)));
+                $("#amount").val(amt);
+            }
+        }
+
+    })
+
+    function LoadAdjustmentList() {
+        var ctr = 0;
+
+        $('#AdjustmentListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/PayrollAdjustment/GetPayAdjustmentList'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                EmpID: {
+                    title: 'Emp ID',
+                    width: '5%',
+                    visibility: 'fixed',
+                },
+                EmpName: {
+                    title: 'Emp Name',
+                    width: '13%',
+                    visibility: 'fixed',
+                },
+                AccountID: {
+                    title: 'Account ID',
+                    width: '6%',
+                    visibility: 'fixed',
+                },
+                Description: {
+                    title: 'Description',
+                    width: '8%',
+                    visibility: 'fixed',
+                },
+                Amount: {
+                    title: 'Amount',
+                    width: '6%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="text-align: right;">' + addCommas(data.record.Amount.toFixed(2)) + '</p>';
+                    }
+                },
+                IsClosed: {
+                    title: 'Closed',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 'true': '<input type="checkbox" checked onclick="return false" />', 'false': '<input type="checkbox" onclick="return false" />' }
+                },
+                Edit: {
+                    title: '',
+                    width: '4%',
+                    display: function (data) {
+                        return '<button title="Edit this record." data-target="#TimecardPopup" data-toggle="modal" id="delete"><i class="fa fa-edit" aria-hidden="true"></i></button> ';
+                    }
+                },
+                Delete: {
+                    title: '',
+                    width: '4%',
+                    display: function (data) {
+                        return '<button title="Delete this record." data-target="#TimecardPopup" data-toggle="modal" id="delete"><i class="fa fa-trash" aria-hidden="true"></i></button> ';
+                    }
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#AdjustmentListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#AdjustmentListContainer').jtable('load');
+
+    }
+</script>

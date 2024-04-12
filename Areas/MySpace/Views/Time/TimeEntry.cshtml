@@ -1,0 +1,701 @@
+﻿@model PAY.Web.Models.EmployeeViewModel
+@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "My Time Entries";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+
+    div.jtable-main-container {
+        font-size:11px;
+    }
+
+    div.jtable-main-container > table.jtable > thead th{
+        font-size:11px;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>My Time Entries</span></b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> Time Entries</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12" style="padding-top:10px;">
+    
+
+    <div id="TimeEntriesContainer"></div>
+
+    <div class="row" style="margin-top:20px;margin-left:10px;">
+        <div class="col-md-4">
+            <div class="row">
+                <div class="box box-success">
+                    <div class="box-header with-border" style="padding-bottom:0px">
+                        <h3 class="box-title">Summary</h3>
+                    </div>
+
+                    <div class="box-body" style="padding-top:0px;">
+                        <div class="tbl-containerx">
+                            <table id="myCommonTable">
+                                <thead class="header">
+                                    <tr>
+                                        <th style="width:1%">#</th>
+                                        <th style="width:43%">Hours</th>
+                                        <th style="width:5%">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fixed-tbl">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>REG HRS</td>
+                                        <td><span id="regHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>SH HRS</td>
+                                        <td><span id="shHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>RH HRS</td>
+                                        <td><span id="rhHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>HH HRS</td>
+                                        <td><span id="hhHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>RDSH HRS</td>
+                                        <td><span id="rdshHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>RDRH HRS</td>
+                                        <td><span id="rdrhHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>RDHH HRS</td>
+                                        <td><span id="rdhhHrs">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>LATE (Minutes)</td>
+                                        <td><span id="late">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>UNDERTIME</td>
+                                        <td><span id="ut">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>VL</td>
+                                        <td><span id="vl">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>SL</td>
+                                        <td><span id="sl">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>12</td>
+                                        <td>SIL</td>
+                                        <td><span id="sil">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>13</td>
+                                        <td>PL</td>
+                                        <td><span id="pl">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>14</td>
+                                        <td>ML</td>
+                                        <td><span id="ml">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>15</td>
+                                        <td>SPL</td>
+                                        <td><span id="spl">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>16</td>
+                                        <td>BL</td>
+                                        <td><span id="bl">--</span></td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" style="margin-left:10px;">
+            <div class="row">
+                <div class="box box-success">
+                    <div class="box-header with-border" style="padding-bottom:0px">
+                        <h3 class="box-title"></h3>
+                    </div>
+
+                    <div class="box-body" style="padding-top:0px;">
+                        <div class="tbl-containerx">
+                            <table id="myCommonTable">
+                                <thead class="header">
+                                    <tr>
+                                        <th style="width:1%">#</th>
+                                        <th style="width:43%">Hours</th>
+                                        <th style="width:5%">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fixed-tbl">
+                                    <tr>
+                                        <td>17</td>
+                                        <td>REG OT HRS</td>
+                                        <td><span id="regOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>18</td>
+                                        <td>SH OT HRS</td>
+                                        <td><span id="shOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>19</td>
+                                        <td>RH OT HRS</td>
+                                        <td><span id="rhOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>20</td>
+                                        <td>HH OT HRS</td>
+                                        <td><span id="hhOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>21</td>
+                                        <td>RD OT HRS</td>
+                                        <td><span id="rdOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>22</td>
+                                        <td>RDSH OT HRS</td>
+                                        <td><span id="rdshOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>23</td>
+                                        <td>RDRH OT HRS</td>
+                                        <td><span id="rdrhOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>24</td>
+                                        <td>RDHH OT HRS</td>
+                                        <td><span id="rdhhOT">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>25</td>
+                                        <td>REG ND HRS</td>
+                                        <td><span id="regND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>26</td>
+                                        <td>SH ND HRS</td>
+                                        <td><span id="shND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>27</td>
+                                        <td>RH ND HRS</td>
+                                        <td><span id="rhND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>28</td>
+                                        <td>HH ND HRS</td>
+                                        <td><span id="hhND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>29</td>
+                                        <td>RD ND HRS</td>
+                                        <td><span id="rdND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>30</td>
+                                        <td>RDSH ND HRS</td>
+                                        <td><span id="rdshND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>31</td>
+                                        <td>RDRH ND HRS</td>
+                                        <td><span id="rdrhND">--</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>32</td>
+                                        <td>RDHH ND HRS</td>
+                                        <td><span id="rdhhND">--</span></td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="col-md-2" style="margin-left:40px;">
+            <button type="button" class="btn btn-flat " id="btnNew" name="submit" style="margin-right:15px;"><span class="fa fa-print"></span> Print </button>
+        </div>
+
+        @Html.HiddenFor(a => a.EmployeeDetail.EmpID, new { id = "empId" })
+        @Html.HiddenFor(a => a.EmployeeDetail.PeriodId, new { id = "periodId" })
+        @Html.HiddenFor(a => a.EmployeeDetail.FullName, new { id = "fullName" })
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        LoadTimeEntry();
+        LoadTimeSummary();
+
+        $("#empName").text("[" + $("#empId").val() + "] - " + $("#fullName").val());
+    });
+
+
+    function LoadTimeSummary() {
+        var periodId = $("#periodId").val();
+        var employeeId = $("#empId").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetTimeSummaryPerEmployeeId")',
+            data: { payrollPeriod: periodId, empId: employeeId },
+            dataType: 'json',
+            success: function (result) {
+                if (result.RegHrs != 0) {
+                    $("#regHrs").text(result.RegHrs);
+                }
+
+                if (result.SH_Hrs != 0) {
+                    $("#shHrs").text(result.SH_Hrs);
+                }
+                
+                if (result.RH_Hrs != 0) {
+                    $("#rhHrs").text(result.RH_Hrs);
+                }
+
+                if (result.HH_Hrs != 0) {
+                    $("#hhHrs").text(result.HH_Hrs);
+                }
+
+                if (result.RDSH_Hrs != 0) {
+                    $("#rdshHrs").text(result.RDSH_Hrs);
+                }
+                
+                if (result.RDRH_Hrs != 0) {
+                    $("#rdrhHrs").text(result.RDRH_Hrs);
+                }
+
+                if (result.RDHH_Hrs != 0) {
+                    $("#rdhhHrs").text(result.RDHH_Hrs);
+                }
+
+                if (result.Late != 0) {
+                    $("#late").text(result.Late);
+                }
+
+                if (result.UT != 0) {
+                    $("#ut").text(result.UT);
+                }
+                
+                if (result.VL != 0) {
+                    $("#vl").text(result.VL);
+                }
+
+                if (result.SL != 0) {
+                    $("#sl").text(result.SL);
+                }
+
+                if (result.SIL != 0) {
+                    $("#sil").text(result.SIL);
+                }
+
+                if (result.PL != 0) {
+                    $("#pl").text(result.PL);
+                }
+
+                if (result.ML != 0) {
+                    $("#ml").text(result.ML);
+                }
+
+                if (result.SPL != 0) {
+                    $("#spl").text(result.SPL);
+                }
+                
+                if (result.SPL != 0) {
+                    $("#bl").text(result.BL);
+                }
+
+                if (result.RegOT_Hrs != 0) {
+                    $("#regOT").text(result.RegOT_Hrs);
+                }
+
+                if (result.SH_OTHrs != 0) {
+                    $("#shOT").text(result.SH_OTHrs);
+                }
+
+                if (result.RH_OTHrs != 0) {
+                    $("#rhOT").text(result.RH_OTHrs);
+                }
+                
+                if (result.RD_OTHrs != 0) {
+                    $("#rdOT").text(result.RD_OTHrs);
+                }
+
+                if (result.HH_OTHrs != 0) {
+                    $("#hhOT").text(result.HH_OTHrs);
+                }
+
+                if (result.RDSH_OTHrs != 0) {
+                    $("#rdshOT").text(result.RDSH_OTHrs);
+                }
+
+                if (result.RDRH_OTHrs != 0) {
+                    $("#rdrhOT").text(result.RDRH_OTHrs);
+                }
+
+                if (result.RDHH_OTHrs != 0) {
+                    $("#rdhhOT").text(result.RDHH_OTHrs);
+                }
+                
+                if (result.Reg_NDHrs != 0) {
+                    $("#regND").text(result.Reg_NDHrs);
+                }
+
+                if (result.SH_NDHrs != 0) {
+                    $("#shND").text(result.SH_NDHrs);
+                }
+
+                if (result.RH_NDHrs != 0) {
+                    $("#rhND").text(result.RH_NDHrs);
+                }
+
+                if (result.RD_NDHrs != 0) {
+                    $("#rdND").text(result.RD_NDHrs);
+                }
+
+                if (result.HH_NDHrs != 0) {
+                    $("#hhND").text(result.HH_NDHrs);
+                }
+                
+                if (result.RDSH_NDHrs != 0) {
+                    $("#rdshND").text(result.RDSH_NDHrs);
+                }
+
+                if (result.RDRH_NDHrs != 0) {
+                    $("#rdrhND").text(result.RDRH_NDHrs);
+                }
+
+                if (result.RDHH_NDHrs != 0) {
+                    $("#rdhhND").text(result.RDHH_NDHrs);
+                }
+                
+            },
+        });
+    }
+
+    function LoadTimeEntry() {
+        var ctr = 0;
+        var periodId = $("#periodId").val();
+        var employeeId = $("#empId").val();
+
+        $('#TimeEntriesContainer').jtable({
+            title: '',
+            //paging: true,
+            pageSize: 10,
+            //sorting: true,
+            //defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/Admin/Employee/GetTimeEntry/' + employeeId + "/" + periodId
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Day: {
+                    title: 'Day',
+                    width: '3%',
+                    visibility: 'fixed',
+                },
+                Date: {
+                    title: 'Date',
+                    width: '5%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd'
+                },
+                DayType: {
+                    title: 'Type',
+                    width: '4%',
+                    visibility: 'fixed',
+                },
+                ShiftCode: {
+                    title: 'Shift',
+                    width: '5%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="display: inline-block;">' + data.record.ShiftCode + '</p>'
+                    }
+                },
+                TimeInString: {
+                    title: 'Time In',
+                    width: '4%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="display: inline-block;">' + data.record.TimeInString + '</p>'
+                    }
+                },
+                //BreakOut: {
+                //    title: 'Break Out',
+                //    width: '5%',
+                //    visibility: 'fixed',
+                //    type: 'date',
+                //    displayFormat: 'mm-dd-yy'
+                //},
+                //BreakIn: {
+                //    title: 'Break In',
+                //    width: '5%',
+                //    visibility: 'fixed',
+                //    type: 'date',
+                //    displayFormat: 'mm-dd-yy'
+                //},
+                TimeOutString: {
+                    title: 'Time Out',
+                    width: '4%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="display: inline-block;">' + data.record.TimeOutString + '</p>'
+                    }
+                },
+                TotalHrs: {
+                    title: 'Total Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.TotalHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.TotalHrs + '</p>'
+                        }
+
+                    }
+                },
+                Late: {
+                    title: 'Late',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.Late == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.Late + '</p>'
+                        }
+
+                    }
+                },
+                Undertime: {
+                    title: 'UT',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.Undertime == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.Undertime + '</p>'
+                        }
+
+                    }
+                },
+                ApprovedOTHrs: {
+                    title: 'Aprv OT',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.ApprovedOTHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.ApprovedOTHrs + '</p>'
+                        }
+
+                    }
+                },
+                RenderedOTHrs: {
+                    title: 'OT Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.RenderedOTHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.RenderedOTHrs + '</p>'
+                        }
+
+                    }
+                },
+                NDHrs: {
+                    title: 'ND Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.NDHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.NDHrs + '</p>'
+                        }
+
+                    }
+                },
+                Reg_Hrs: {
+                    title: 'Reg Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.Reg_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.Reg_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                RD_Hrs: {
+                    title: 'RD Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.RD_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.RD_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                PaidLeave_Hrs: {
+                    title: 'Paid Leaves',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.PaidLeave_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.PaidLeave_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                UnpaidLeave_Hrs: {
+                    title: 'Unpaid Leaves',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.UnpaidLeave_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.UnpaidLeave_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                HolidayHrs: {
+                    title: 'Holiday Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.HolidayHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.HolidayHrs + '</p>'
+                        }
+
+                    }
+                }
+
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#TimeEntriesContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#TimeEntriesContainer').jtable('load');
+
+    }
+
+</script>

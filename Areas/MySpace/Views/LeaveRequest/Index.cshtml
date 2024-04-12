@@ -1,0 +1,494 @@
+﻿@model PAY.Web.Models.LeaveRequestViewModel
+@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Leave Request";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>My Leave Request</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> My Leave Request</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12">
+    <button type="button" class="btn btn-flat pull-right" id="btnNew" name="submit" style="margin-right:15px; margin-top: -5px;"><span class="fa fa-newspaper-o"></span> New</button>
+</div>
+
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="LeaveRequestListContainer"></div>
+    @Html.HiddenFor(a=> a.LeaveRequest.EmpId, new {id="empId"})
+    @Html.HiddenFor(a=> a.RestDay, new {id="restday"})
+    
+</div>
+
+
+<div id="NewPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">New Leave Request</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            @using (Html.BeginForm("SaveLeaveRequest", "LeaveRequest", FormMethod.Post))
+            {
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="CustomerName">Leave Request No:</label>
+                                    @Html.TextBoxFor(a => a.LeaveRequest.LeaveRequestNo, new { id = "lrNo", @class = "form-control", @readonly = "readonly" })
+                                </div>
+                                <div class="col-md-4 pull-right">
+                                    <label for="CustomerName">Date File:</label>
+                                    @Html.TextBoxFor(a => a.LeaveRequest.DateFiled, new { id = "dateFile", @class = "form-control", @readonly = "readonly" })
+                                </div>
+
+                                <input type="text" id="days" readonly hidden />
+                                
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-4">
+                                    <label for="CustomerName">Date From:</label>
+                                    <input type="date" id="dateFrom" class="form-control" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="CustomerName">Date To:</label>
+                                    <input type="date" id="dateTo" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="form-control" style="margin-top:28px;" id="btnGenerate" type="button">Generate List</button>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-12">
+                                    <div class="tbl-containerx">
+                                        <table id="myTable">
+                                            <thead class="header" style="height:30px;">
+                                                <tr>
+                                                    <th style="width:3%;text-align:center;">Off Day</th>
+                                                    <th style="width:10%;text-align:center;">Day</th>
+                                                    <th style="width:12%;text-align:center;">Date</th>
+                                                    <th style="width:10%;text-align:center;">Type</th>
+                                                    <th style="width:25%;text-align:center;">Duration</th>
+                                                    <th style="width:3%;text-align:center;">Count</th>
+                                                    <th hidden></th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fixed-tbl">
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-8">
+                                    <label for="remarks">Remarks:</label>
+                                    <input type="text" id="remarks" class="form-control" />
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <label for="total">Total Days:</label>
+                                    <input type="text" id="total" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-6">
+                                   
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <button type="button" class="pull-right form-control" id="btnSave">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+            }
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadLeaveRequestList();
+
+        var d = new Date();
+        var requestDate = ParseDate(d);
+
+        $('#dateFile').val(requestDate);
+
+    });
+
+
+    $(document.body).on('change', '.dayCount', function () {
+        var optionSelected = $(this).find("option:selected");
+        var valueSelected = optionSelected.val();
+        var textSelected = optionSelected.text();
+
+        var n = $(this).prop("id");
+        var i = n.substring(8);
+
+        switch (valueSelected) {
+            case "0":
+                $("#dCount" + i).val("");
+                break;
+            case "1":
+                $("#dCount" + i).val("1");
+                break;
+            default:
+                $("#dCount" + i).val("0.5");
+                break;
+        }
+
+        var days = $("#days").val();
+        var d;
+        var total = 0;
+
+        for (i = 0; i <= days; i++) {
+            d = $("#dCount" + i).val();
+
+            if (d != "") {
+                total = total + parseFloat(d);
+            }
+        }
+
+        $("#total").val(total);
+    });
+
+
+    $("#btnNew").click(function () {
+        $("#dateFrom").val("");
+        $("#dateTo").val("");
+        $("#myTable tbody").empty();
+
+        $("#NewPopup").modal("show");
+    })
+
+
+    $("#btnGenerate").click(function () {
+            Generate();
+            GetHolidayDate();
+    })
+
+    function GetHolidayDate() {
+        var startDate = $("#dateFrom").val();
+        var endDate = $("#dateTo").val();
+
+        var holiday = [];
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetHolidayPerEmployee")',
+            data: { dtFrom: startDate, dtTo: endDate },
+            dataType: 'json',
+            success: function (result) {
+                $.each(result, function (i, dr) {
+                    var pattern = /Date\(([^)]+)\)/;
+
+                    var hDate = pattern.exec(dr.HolidayDate);
+                    var pHolidayDt = new Date(parseFloat(hDate[1]));
+                    var holidate = (pHolidayDt.getMonth() + 1) + "/" + pHolidayDt.getDate() + "/" + pHolidayDt.getFullYear();
+
+                    holiday.push(ParseDate(holidate));
+                });
+
+                var days = parseInt($("#days").val());
+                var d;
+
+                for (i = 0; i < days; i++) {
+                    d = $("#dt" + i).text();
+
+                    if (holiday.indexOf(d) != -1) {
+                        $("#chk" + i).prop("checked", true);
+                        $("#leaveType" + i).prop("disabled", true);
+                        $("#dayCount" + i).prop("disabled", true);
+                        $("#dCount" + i).prop("disabled", true);
+                    }
+                }
+            },
+        });
+    }
+
+    function Generate() {
+        $("#myTable tbody").empty();
+
+        var rd = $("#restday").val();
+        let rdays = rd.split(",");
+        var restDays = [];
+
+        for (let i = 0; i < rdays.length; i++) {
+
+            switch (rdays[i]) {
+                case "1":
+                    restDays.push("Monday");
+                    break;
+                case "2":
+                    restDays.push("Tuesday");
+                    break;
+                case "3":
+                    restDays.push("Wednesday");
+                    break;
+                case "4":
+                    restDays.push("Thursday");
+                    break;
+                case "5":
+                    restDays.push("Friday");
+                    break;
+                case "6":
+                    restDays.push("Saturday");
+                    break;
+                case "7":
+                    restDays.push("Sunday");
+                    break;
+            }
+        }
+
+        var startDate = $("#dateFrom").val();
+        var endDate = $("#dateTo").val();
+
+        var start = new Date(startDate);
+        var end = new Date(endDate);
+
+        var diffDate = (end - start) / (1000 * 60 * 60 * 24);
+        var days = Math.round(diffDate) + 1;
+
+        const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        var markup = "";
+
+        $("#days").val(parseInt(days)-1);
+
+        for (var i = 0; i < days; i++) {
+            var s = new Date(startDate);
+
+            var n = s.setDate(s.getDate() + i);
+            var x = new Date(n);
+
+            if (restDays.indexOf(weekday[x.getDay()]) != -1) {
+                markup = '<tr><td><input type ="checkbox" id="chk' + i + '" checked onclick="return false"></td><td>' + weekday[x.getDay()] + '</td><td id="dt' + i + '">' + ParseDate(x) + '</td><td><select class = "leaveType form-control" id="leaveType' + i + '" disabled></select></td><td><select id = "dayCount' + i + '" class = "dayCount form-control" disabled></select></td><td><input type="text" style="width:50px;" id="dCount' + i + '" disabled readonly></td><td hidden><input type="text" id="rowCtr' + i + '">' + i + '</td></tr>'
+            }
+            else {
+                markup = '<tr><td><input type ="checkbox" id="chk' + i + '" onclick="return false"></td><td>' + weekday[x.getDay()] + '</td><td id="dt' + i + '">' + ParseDate(x) + '</td><td><select class = "leaveType form-control" id="leaveType' + i + '"></select></td><td><select id = "dayCount' + i + '" class = "dayCount form-control"></select></td><td><input type="text" style="width:50px;" id="dCount' + i + '" readonly></td><td hidden><input type="text" id="rowCtr' + i + '">' + i + '</td></tr>'
+            }
+
+            $("#myTable tbody").append(markup);
+        }
+
+        GetLeaveType();
+        GetDayCount();
+    }
+
+    function GetLeaveType() {
+         $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetLeaveType")',
+            data: {},
+            dataType: 'json',
+             success: function (result) {
+                 $.each(result, function (i, dr) {
+                     if (dr.Code == "[Select]") {
+                         $('.leaveType').append('<option selected="selected" value="' + dr.Code + '">' + dr.Code + '</option>');
+                     }
+                     else {
+                         $('.leaveType').append('<option value="' + dr.Code + '">' + dr.Code + '</option>');
+                     }
+                 });
+            },
+         });
+    }
+
+    function GetDayCount() {
+         $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetDayCount")',
+            data: {},
+            dataType: 'json',
+             success: function (result) {
+                 $.each(result, function (i, dr) {
+                     $('.dayCount').append('<option value="' + dr.Code + '">' + dr.Description + '</option>');
+                 });
+            },
+         });
+    }
+
+    function ParseDate(myDate) {
+        var now = new Date(myDate);
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+        return today;
+    }
+
+    function LoadLeaveRequestList() {
+        var ctr = 0;
+
+        $('#LeaveRequestListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/MySpace/LeaveRequest/GetLeaveRequestByEmpId/' + $("#empId").val()
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed'
+                },
+                LeaveRequestNo: {
+                    title: 'LR No',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                DateFiled: {
+                    title: 'Date Filed',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                LeaveDate: {
+                    title: 'Date',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                LeaveType: {
+                    title: 'Type',
+                    width: '2%',
+                    visibility: 'fixed'
+                },
+                NumberOfDays: {
+                    title: 'Days',
+                    width: '1%',
+                    visibility: 'fixed'
+                },
+                Remarks: {
+                    title: 'Remarks',
+                    width: '8%',
+                    visibility: 'fixed'
+                },
+                IsApproved: {
+                    title: 'Approved',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 1: '<input type="checkbox" checked onclick="return false"/>', 0: '<input type="checkbox" onclick="return false"/>' }
+                },
+                ApprovalDate: {
+                    title: 'Approved Date',
+                    width: '2%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#LeaveRequestListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#LeaveRequestListContainer').jtable('load');
+
+    }
+
+
+
+    $("#btnSave").click(function () {
+        var leaves = new Array();
+        var days = $("#days").val();
+        
+        for (i = 0; i <=days; i++) {
+            if ($("#chk" + i).prop("checked") == false) {
+
+                var req = {};
+                req.RecordId = "@Guid.NewGuid()";
+                req.EmpId = $("#empId").val();
+                req.DateFiled = $("#dateFile").val();
+                req.LeaveDate = $("#dt" + i).text();
+                req.NumberOfDays = $("#dCount" + i).val();
+                req.LeaveType = $("#leaveType" + i).val();
+                req.Remarks = $("#remarks").val();
+                req.LeaveRequestNo = $("#lrNo").val();
+
+                leaves.push(req);
+            }
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveLeaveRequest")',
+            data: JSON.stringify(leaves),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (r) {
+                alert("Leave request has been submitted.");
+                window.location.href = '@Url.Action("Index", "LeaveRequest", new { area = "MySpace" })';
+            }
+        });
+    })
+</script>

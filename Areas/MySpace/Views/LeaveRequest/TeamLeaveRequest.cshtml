@@ -1,0 +1,332 @@
+﻿@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Team Leave Request";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+    
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Team Leave Request</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> Team Leave Request </li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="LeaveListContainer"></div>
+</div>
+
+
+<div id="EditPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:50%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="pophdr">Leave Request Approval</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="LRNo">Leave Request No:</label>
+                                    <input type="text" id="lrNo" class="form-control" readonly>
+
+                                </div>
+                                <div class="col-md-4 pull-right">
+                                    <label for="CustomerName">Date File:</label>
+                                    <input type="text" id="dateFile" class="form-control" readonly />
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-4">
+                                    <label for="CustomerName">Date From:</label>
+                                    <input type="date" id="dateFrom" class="form-control" readonly />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="CustomerName">Date To:</label>
+                                    <input type="date" id="dateTo" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-12">
+                                    <div class="tbl-containerx">
+                                        <table id="myTable">
+                                            <thead class="header" style="height:30px;">
+                                                <tr>
+                                                    <th style="width:15%;text-align:center;">Day</th>
+                                                    <th style="width:17%;text-align:center;">Date</th>
+                                                    <th style="width:7%;text-align:center;">Type</th>
+                                                    <th style="width:3%;text-align:center;">Day</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="fixed-tbl">
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-8">
+                                    <label for="remarks">Remarks:</label>
+                                    <input type="text" id="remarks" class="form-control" readonly />
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <label for="total">Total Days:</label>
+                                    <input type="text" id="total" class="form-control" readonly />
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-8">
+                                    <label for="note">Approval Note</label>
+                                    <input type="text" id="note" class="form-control" />
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <label for="approval">Approval</label>
+                                    <select id="approval" class="form-control">
+                                        <option>[Select]</option>
+                                        <option value=1>Approved</option>
+                                        <option value=0>Disapproved</option>
+                                        <option value=2>Cancelled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px;">
+                                <div class="col-md-8">
+                                    
+                                </div>
+                                <div class="col-md-3 pull-right">
+                                    <button type="button" class="btn btn-flat pull-right " id="btnSave" name="submit"><span class="fa fa-save"></span> Save </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadTeamLeaveRequest();
+    });
+
+
+    function LoadTeamLeaveRequest() {
+        var ctr = 0;
+
+        $('#LeaveListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/MySpace/LeaveRequest/GetTeamLeaveRequest'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                LeaveRequestNo: {
+                    title: 'Request No',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<a title="Leave Details"  href="#" onclick="GetLeaveRequestDetail();">' + data.record.LeaveRequestNo + "</a>";
+                    }
+                },
+                EmpId: {
+                    title: 'Emp ID',
+                    width: '3%',
+                    visibility: 'fixed',
+                },
+                FullName: {
+                    title: 'Name',
+                    width: '8%',
+                    visibility: 'fixed',
+                },
+                DateFiled: {
+                    title: 'Request Date',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm-dd-yy'
+                },
+                LeaveType: {
+                    title: 'Type',
+                    width: '3%',
+                    visibility: 'fixed',
+                },
+                NumberOfDays: {
+                    title: 'Days',
+                    width: '3%',
+                    visibility: 'fixed',
+                },
+                Remarks: {
+                    title: 'Remarks',
+                    width: '15%',
+                    visibility: 'fixed',
+               }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#LeaveListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+                        $("#lrNo").val(record.LeaveRequestNo);
+                    });
+                }
+            }
+        });
+
+        $('#LeaveListContainer').jtable('load');
+
+    }
+
+    function GetLeaveRequestDetail() {
+        var leaveNo = $("#lrNo").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetLeaveRequestDetail")',
+            data: { lrNo: leaveNo },
+            dataType: 'json',
+            success: function (result) {
+                var pattern = /Date\(([^)]+)\)/;
+
+                var fDate = pattern.exec(result[0].DateFiled);
+                var fiDate = new Date(parseFloat(fDate[1]));
+                var fileDate = (fiDate.getMonth() + 1) + "/" + fiDate.getDate() + "/" + fiDate.getFullYear();
+
+                var lfDate = pattern.exec(result[0].LeaveDate);
+                var lvfDate = new Date(parseFloat(lfDate[1]));
+                var leaveFromDate = (lvfDate.getMonth() + 1) + "/" + lvfDate.getDate() + "/" + lvfDate.getFullYear();
+
+                $("#dateFile").val(fileDate);
+                $("#dateFrom").val(ParseDate(leaveFromDate));
+                $("#remarks").val(result[0].Remarks);
+                $("#total").val(result[0].NumberOfDays);
+
+                const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                var markup = "";
+                var ctr = 0;
+
+                $.each(result, function (i, dr) {
+                    var lDate = pattern.exec(dr.LeaveDate);
+                    var lvDate = new Date(parseFloat(lDate[1]));
+                    var leaveDate = (lvDate.getMonth() + 1) + "/" + lvDate.getDate() + "/" + lvDate.getFullYear();
+
+                    var x = new Date(leaveDate);
+
+                    markup = '<tr><td>' + weekday[x.getDay()] + '</td><td id="dt' + i + '">' + ParseDate(x) + '</td><td>' + dr.LeaveType + '</td><td>' + dr.NumberOfDays + '</td ></tr>'
+
+                    $("#myTable tbody").append(markup);
+
+                    ctr = ctr + 1;
+                });
+
+                var ltDate = pattern.exec(result[ctr-1].LeaveDate);
+                var lvtDate = new Date(parseFloat(ltDate[1]));
+                var leaveToDate = (lvtDate.getMonth() + 1) + "/" + lvtDate.getDate() + "/" + lvtDate.getFullYear();
+                $("#dateTo").val(ParseDate(leaveToDate));
+
+                $("#EditPopup").modal("show");
+                
+            },
+        });
+    }
+
+
+    function ParseDate(myDate) {
+        var now = new Date(myDate);
+        var day = ("0" + now.getDate()).slice(-2);
+        var month = ("0" + (now.getMonth() + 1)).slice(-2);
+        var today = now.getFullYear() + "-" + (month) + "-" + (day);
+
+        return today;
+    }
+
+    $("#btnSave").click(function () {
+        var lrNo = $("#lrNo").val();
+        var note = $("#note").val();
+        var app = $('#approval').find(":selected").val();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SaveApproval")',
+            data: {
+                lrNo: lrNo,
+                note: note,
+                approval: app
+            },
+            dataType: 'json',
+            success: function (result) {
+                $("#EditPopup").modal("hide");
+                $('#LeaveListContainer').jtable('reload');
+                alert("Reocrd has been saved.");
+
+            }
+         });
+    });
+</script>

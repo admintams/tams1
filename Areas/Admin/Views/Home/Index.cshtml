@@ -1,0 +1,246 @@
+﻿@model PAY.Web.Models.SalesReportViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Meter Reading";
+}
+
+<style>
+    .info-box {
+        position: relative !important;
+    }
+
+    .bg-warning {
+        background-color: #ffc107 !important;
+    }
+
+    .bg-success {
+        background-color: #28a745 !important;
+    }
+
+    .bg-danger {
+        background-color: #dc3545 !important;
+    }
+</style>
+
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Dashboard - <span style="font-size:medium">Current Payroll Period : @Session["PeriodDesc"]</span></b>
+    </h1>
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active">Dashboard</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+}
+
+
+<div class="row" style="margin-left: 20px;">
+    <h4>A. Employee Stats</h4>
+</div>
+
+<div class="col-md-12 row">
+    <div class="dashboard-panel">
+        <div class="">
+            <div class="col-md-4">
+                <div class="info-box" style="width:90%;">
+                    <span class="info-box-icon bg-success elevation-1"><i class="fa fa-users"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text" style="font-size:14px;">Total Employees</span>
+                        <span class="info-box-number" style="font-size:25px;">
+                            <small>152</small>
+                            <span style="text-align:right" id="dtd"></span>
+                        </span>
+                    </div>
+                </div>
+                @*<div>
+                    <input type="date" id="dtReportDate" class="form-control date date-panel" onchange="GetDateRange();"  style="width:290px;"/>
+                </div>*@
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-box" style="width:90%;">
+                    <span class="info-box-icon bg-warning elevation-1"><i class="fa fa-user-plus"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text" style="font-size:14px;">Regular</span>
+                        <span class="info-box-number" style="font-size:25px;">
+                            <small>137</small>
+                            <span style="text-align:right" id="mtd"></span>
+                        </span>
+                    </div>
+
+                </div>
+                @*<div>
+                    <input type="text" id="dtReportMonth" class="form-control date-panel" readonly style="width:290px;" />
+                </div>*@
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-box" style="width:90%;">
+                    <span class="info-box-icon bg-danger elevation-1"><i class="fa fa-user"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text" style="font-size:14px;">Probationary</span>
+                        <span class="info-box-number" style="font-size:25px;">
+                            <small>15</small>
+                            <span style="text-align:right" id="ytd"></span>
+                        </span>
+                    </div>
+                </div>
+                @*<div>
+                    <input type="text" id="dtReportYear" class="form-control date-panel" readonly style="width:290px;" />
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div class="row col-md-12" style="margin-left: 20px; margin-top:40px;">
+    <h4>B. Internet Service vs Water Service</h4>
+</div>*@
+
+@*<div class="col-md-12">
+    <div class="row">
+        <div class="info-box bg-yellow col-md-4">
+            <span class="info-box-icon"><i class="fa fa-cloud"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Internet Service</span>
+                <span class="info-box-number" id="net" style="font-size:25px;">5,200</span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 50%"></div>
+                </div>
+                <span class="progress-description">
+                    
+                </span>
+            </div>
+
+        </div>
+
+        <div class="info-box bg-green col-md-4">
+            <span class="info-box-icon"><i class="fa fa-shower"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Water Service</span>
+                <span class="info-box-number" id="water" style="font-size:25px;">92,050</span>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 20%"></div>
+                </div>
+                <span class="progress-description">
+                    
+                </span>
+            </div>
+
+        </div>
+
+
+    </div>
+</div>
+
+<div class="row col-md-12" style="margin-left: 20px; margin-top:40px;">
+    <h4>C. 3 Accounts for Billing Today - <span><a href="">Generate Billing Now!</a></span></h4>
+</div>*@
+
+<div class="row col-md-12" style="margin-top:40px;">
+    <div class="col-md-6">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title">B. Holiday(s) in this cut-off:</h3>
+            </div>
+
+            <div class="box-body no-padding">
+                <table class="table table-condensed">
+                    <tbody>
+                        <tr>
+                            <th style="width: 15px">#</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>1.</td>
+                            <td>January 02, 2023</td>
+                            <td>
+                               Special Non-working Holiday
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="row col-md-12" style="margin-left: 0px; margin-top:30px;">
+    <h4>C. Last DB Backup - <span><a href="">DBBackup-12-31-2022.bak</a></span></h4>
+</div>
+
+
+<script>
+    function addCommas(x) {
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    }
+
+    $(document).ready(function () {
+        //var now = new Date();
+        //var month = (now.getMonth() + 1);
+        //var day = now.getDate();
+        //if (month < 10)
+        //    month = "0" + month;
+        //if (day < 10)
+        //    day = "0" + day;
+        //var today = now.getFullYear() + '-' + month + '-' + day;
+        //$('#dtReportDate').val(today);
+        //GetDateRange();
+    });
+
+    @*function GetDateRange() {
+        var d = new Date();
+        d = $("#dtReportDate").val();
+
+        var parts = d.split('-');
+
+        var mydate = new Date(parts[0], parts[1] - 1, parts[2]);
+
+        var dtd = parts[1] +"/" + parts[2] + "/" + parts[0]
+        var mtd = parts[1] + "/01/" + parts[0] + " to " +  dtd
+        var ytd = "01/01/" + parts[0] + " to " + dtd
+
+        $("#dtReportMonth").val(mtd);
+        $("#dtReportYear").val(ytd);
+
+        $(".trRow").remove();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SalesToDateReport")',
+            data: { reportDate: d},
+            dataType: "json",
+            success: function (result) {
+                var dtd = result.DTD;
+                var mtd = result.MTD
+                var ytd = result.YTD
+                var net = result.Net
+                var water = result.Water
+
+                $("#dtd").text(addCommas(dtd.toFixed(2)));
+                $("#mtd").text(addCommas(mtd.toFixed(2)));
+                $("#ytd").text(addCommas(ytd.toFixed(2)));
+
+                $("#net").text(addCommas(net.toFixed(2)));
+                $("#water").text(addCommas(water.toFixed(2)));
+            },
+            error: function (xhr, status, error) {
+                var err = eval("(" + xhr.responseText + ")");
+                alert(err);
+            }
+        });
+
+    }*@
+
+</script>

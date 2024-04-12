@@ -1,0 +1,451 @@
+﻿@model PAY.Web.Models.HolidayViewModel
+@{
+    Layout = "~/Areas/MySpace/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "My Time Entries";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+
+    div.jtable-main-container {
+        font-size:11px;
+    }
+
+    div.jtable-main-container > table.jtable > thead th{
+        font-size:11px;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>My Time Entries</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> My Space</a></li>
+        <li class="active"> Time Entries</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12" style="padding-top:20px;">
+    <div id="TimeEntriesContainer"></div>
+
+    <div class="row" style="margin-top:20px;margin-left:10px;">
+        <div class="col-md-4">
+            <div class="row">
+                <div class="box box-success">
+                    <div class="box-header with-border" style="padding-bottom:0px">
+                        <h3 class="box-title">Summary</h3>
+                    </div>
+
+                    <div class="box-body" style="padding-top:0px;">
+                        <div class="tbl-containerx">
+                            <table id="myCommonTable">
+                                <thead class="header">
+                                    <tr>
+                                        <th style="width:1%">#</th>
+                                        <th style="width:43%">Hours</th>
+                                        <th style="width:5%">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fixed-tbl">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>REG HRS</td>
+                                        <td>64.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>LATE (Minutes)</td>
+                                        <td>25</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>UNDERTIME</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>REG OT HRS</td>
+                                        <td>2.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>5</td>
+                                        <td>REG ND HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>6</td>
+                                        <td>LEAVES WITH PAY</td>
+                                        <td>8.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7</td>
+                                        <td>LEAVES WITHOUT PAY</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>8</td>
+                                        <td>SUSPENSION</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>9</td>
+                                        <td>OFFDAY REG HRS</td>
+                                        <td>--</td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <input type="text" hidden readonly id="selectedBillDate" />
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" style="margin-left:10px;">
+            <div class="row">
+                <div class="box box-success">
+                    <div class="box-header with-border" style="padding-bottom:0px">
+                        <h3 class="box-title"></h3>
+                    </div>
+
+                    <div class="box-body" style="padding-top:0px;">
+                        <div class="tbl-containerx">
+                            <table id="myCommonTable">
+                                <thead class="header">
+                                    <tr>
+                                        <th style="width:1%">#</th>
+                                        <th style="width:43%">Hours</th>
+                                        <th style="width:5%">Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fixed-tbl">
+                                    <tr>
+                                        <td>9</td>
+                                        <td>OFFDAY OT HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td>
+                                        <td>OFFDAY ND HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>11</td>
+                                        <td>SPECIAL HOLIDAY REG HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12</td>
+                                        <td>SPECIAL HOLIDAY OT HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>13</td>
+                                        <td>SPECIAL HOLIDAY ND HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>14</td>
+                                        <td>REG HOLIDAY REG HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>15</td>
+                                        <td>REG HOLIDAY OT HRS</td>
+                                        <td>--</td>
+                                    </tr>
+                                    <tr>
+                                        <td>16</td>
+                                        <td>REG HOLIDAY ND HRS</td>
+                                        <td>--</td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <input type="text" hidden readonly id="selectedBillDate" />
+
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="col-md-2" style="margin-left:40px;">
+            <button type="button" class="btn btn-flat " id="btnNew" name="submit" style="margin-right:15px;"><span class="fa fa-print"></span> Print </button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        LoadHolidayList();
+    });
+
+
+    function LoadHolidayList() {
+        var ctr = 0;
+
+        $('#TimeEntriesContainer').jtable({
+            title: '',
+            //paging: true,
+            pageSize: 10,
+            //sorting: true,
+            //defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/MySpace/Time/GetTimeEntry'
+            },
+            fields: {
+                Ctr: {
+                    title: '#',
+                    key: false,
+                    create: false,
+                    edit: false,
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Day: {
+                    title: 'Day',
+                    width: '3%',
+                    visibility: 'fixed',
+                },
+                Date: {
+                    title: 'Date',
+                    width: '5%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'yy-mm-dd'
+                },
+                DayType: {
+                    title: 'Type',
+                    width: '4%',
+                    visibility: 'fixed',
+                },
+                ShiftCode: {
+                    title: 'Shift',
+                    width: '5%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="display: inline-block;">' + data.record.ShiftCode + '</p> <a href="#"><span style="margin-left:8px;" class="pull-right"><i class="fa fa-edit"></i></span></a>'
+                    }
+                },
+                TimeInString: {
+                    title: 'Time In',
+                    width: '4%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="display: inline-block;">' + data.record.TimeInString + '</p> <a href="#"><span style="margin-left:8px;"><i class="fa fa-edit"></i></span></a>'
+                    }
+                },
+                //BreakOut: {
+                //    title: 'Break Out',
+                //    width: '5%',
+                //    visibility: 'fixed',
+                //    type: 'date',
+                //    displayFormat: 'mm-dd-yy'
+                //},
+                //BreakIn: {
+                //    title: 'Break In',
+                //    width: '5%',
+                //    visibility: 'fixed',
+                //    type: 'date',
+                //    displayFormat: 'mm-dd-yy'
+                //},
+                TimeOutString: {
+                    title: 'Time Out',
+                    width: '4%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<p style="display: inline-block;">' + data.record.TimeOutString + '</p> <a href="#"><span style="margin-left:8px;"><i class="fa fa-edit"></i></span></a>'
+                    }
+                },
+                TotalHrs: {
+                    title: 'Total Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.TotalHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.TotalHrs + '</p>'
+                        }
+                        
+                    }
+                },
+                Late: {
+                    title: 'Late',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.Late == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.Late + '</p>'
+                        }
+
+                    }
+                },
+                Undertime: {
+                    title: 'UT',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.Undertime == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.Undertime + '</p>'
+                        }
+
+                    }
+                },
+                ApprovedOTHrs: {
+                    title: 'Aprv OT',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.ApprovedOTHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.ApprovedOTHrs + '</p>'
+                        }
+
+                    }
+                },
+                RenderedOTHrs: {
+                    title: 'OT Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.RenderedOTHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.RenderedOTHrs + '</p>'
+                        }
+
+                    }
+                },
+                ND_Hrs: {
+                    title: 'ND Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.ND_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.ND_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                Reg_Hrs: {
+                    title: 'Reg Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.Reg_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.Reg_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                RD_Hrs: {
+                    title: 'RD Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.RD_Hrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.RD_Hrs + '</p>'
+                        }
+
+                    }
+                },
+                HolidayHrs: {
+                    title: 'Holiday Hrs',
+                    width: '3%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        if (data.record.HolidayHrs == null) {
+                            return '<p style="text-align:center;">--</p>'
+                        }
+                        else {
+                            return '<p style="text-align:center;">' + data.record.HolidayHrs + '</p>'
+                        }
+
+                    }
+                }
+               
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#TimeEntriesContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#TimeEntriesContainer').jtable('load');
+
+    }
+
+</script>

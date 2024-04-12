@@ -1,0 +1,201 @@
+﻿@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Employee List";
+}
+
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Employee</b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active">Employee List</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <span class="text-bold" style="margin-left: 15px;">Search: </span>
+        <select name="field" id="field" class="margin-r-5" style="width: 200px;">
+            <option value="itemcode">Employee Id</option>
+            <option value="itemname">Lastname</option>
+            <option value="itemname">Firstname</option>
+        </select>
+        <span> <input type="text" name="itemCode" id="itemCode" placeholder="Enter your search here..." /></span>
+
+        <button type="button" class="btn btn-flat pull-right" id="btnNew" name="submit" style="margin-right:15px; margin-top: -5px;"><span class="fa fa-user"></span> New </button>
+    </div>
+</div>
+
+<div class="col-md-12" style="margin-top: 10px;">
+    <div id="EmployeeListContainer"></div>
+    <input type="text" readonly hidden id="empId" />
+    <input type="text" readonly hidden id="empName"/>
+</div>
+
+
+<div id="TimecardPopup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 40%">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="selectedPlan">Get Time card</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <h3>Date : <span id="period2">@Session["PeriodDesc"]</span></h3>
+                
+            </div>
+            <div class="modal-footer" style="text-align:left">
+                <button id="btnTimeCard" type="button" class="btn btn-flat pull-right">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        LoadEmployeeList();
+    });
+
+
+    $("#btnNew").click(function () {
+        window.location.href = "@Url.Action("EmployeeDetails", "Employee")";
+    })
+
+    function addCommas(x) {
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return parts.join(".");
+    }
+
+    function LoadEmployeeList() {
+        var ctr = 0;
+
+        $('#EmployeeListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Employee/GetEmployeeList'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed'
+                },
+                EmpID: {
+                    title: 'Emp Id',
+                    width: '2%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return '<a title="Edit Employee Details"  href="../Admin/Employee/EmployeeDetails?empID=' + data.record.EmpID + '">' + data.record.EmpID + '</a > ';
+                    }
+                },
+                FullName: {
+                    title: 'Name',
+                    width: '8%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return data.record.Lastname + ", " + data.record.Firstname + " " + data.record.Middlename.substring(0,1) + ".";
+                    }
+                },
+                Department: {
+                    title: 'Department',
+                    width: '5%',
+                    visibility: 'fixed'
+                },
+                Designation: {
+                    title: 'Designation',
+                    width: '7%',
+                    visibility: 'fixed'
+                },
+                DateHired: {
+                    title: 'Date Hired',
+                    width: '3%',
+                    visibility: 'fixed',
+                    type: 'date',
+                    displayFormat: 'mm/dd/yy'
+                },
+                Location: {
+                    title: 'Location',
+                    width: '2%',
+                    visibility: 'fixed'
+                },
+                ShiftCode: {
+                    title: 'Shift',
+                    width: '2%',
+                    visibility: 'fixed'
+                },
+                EmploymentStatus: {
+                    title: 'Status',
+                    width: '1%',
+                    visibility: 'fixed',
+                    type: 'checkbox',
+                    values: { 'ACT': '<input type="checkbox" checked onclick="return false"/>', 'INACT': '<input type="checkbox" onclick="return false"/>' }
+                },
+                Timecard: {
+                    title: '',
+                    width: '2%',
+                    display: function (data) {
+                        return '<button title="Get Time card" data-target="#TimecardPopup" data-toggle="modal" id="timecard"><i class="fa fa-align-justify" aria-hidden="true"></i></button> ';
+                    }
+                },
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#EmployeeListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+                        $("#empId").val(record.EmpID);
+                        $("#empName").val(record.Lastname + ", " +  record.Firstname + " " + record.Middlename.substring(0,1));
+                    });
+                }
+            }
+        });
+
+        $('#EmployeeListContainer').jtable('load');
+
+    }
+
+
+    $("#itemCode").keyup(function (e) {
+        e.preventDefault();
+
+        var s = $('#field :selected').text();
+
+        $('#ExpenseListContainer').jtable('load', {
+            filterValue: $('#itemCode').val(),
+            field: s
+        });
+
+    });
+
+    $("#btnTimeCard").click(function () {
+        var e = $("#empId").val();
+        var n = $("#empName").val();
+
+        var s = "@Url.Action("TimeEntry", "Employee")" + "/" + e + "/" + n;
+        window.location.href = s;
+    });
+</script>

@@ -1,0 +1,471 @@
+﻿@model PAY.Common.Entities.Employee
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Time Entry";
+}
+
+<style>
+        #myCommonTable th, td {
+            padding: 5px !important;
+        }
+
+        #myCommonTable {
+            font-size: 12px !important;
+        }
+    </style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Time Entries- [ <span id="ctr">EMP002 - Macky Reyes</span> ] <span> <button>...</button></span></b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active">Time Entries</li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+}
+
+
+
+<div class="col-md-10" style="margin-left:20px;">
+    <div class="row">
+        <div class="box box-info">
+            <div class="box-header with-border" style="padding-bottom:0px">
+                <h3 class="box-title">Cut-Off: January 01-15, 2023</h3>
+            </div>
+
+            <div class="box-body" style="padding-top:10px;">
+                <div class="tbl-containerx">
+                    <table id="myCommonTable">
+                        <thead class="header">
+                            <tr>
+                                <th style="width:1%">#</th>
+                                <th style="width:4%">Date</th>
+                                <th style="width:3%">Day</th>
+                                <th style="width:3%">Day Type</th>
+                                <th style="width:7%">Shift</th>
+                                <th style="width:4%">Time In</th>
+                                <th style="width:4%">Break Out</th>
+                                <th style="width:4%">Break In</th>
+                                <th style="width:4%">Time Out</th>
+                                <th style="width:4%">Total Hrs</th>
+                                <th style="width:4%">Total Hrs Wrk</th>
+                                <th style="width:4%">Late (Min)</th>
+                                <th style="width:4%">UT</th>
+                                <th style="width:4%">Total OT Hrs</th>
+
+                            </tr>
+                        </thead>
+                        <tbody class="fixed-tbl">
+                            <tr>
+                                <td>1</td>
+                                <td>01/01/2023</td>
+                                <td>SUN</td>
+                                <td>OFF</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>01/02/2023</td>
+                                <td>MON</td>
+                                <td>SH</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>01/03/2023</td>
+                                <td>TUE</td>
+                                <td>VL</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>01/04/2023</td>
+                                <td>WED</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>08:25AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>25</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>01/05/2023</td>
+                                <td>THU</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>01/06/2023</td>
+                                <td>FRI</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>01/03/2023</td>
+                                <td>SAT</td>
+                                <td>OFF</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>01/08/2023</td>
+                                <td>SUN</td>
+                                <td>OFF</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>01/09/2023</td>
+                                <td>MON</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>07:09PM</td>
+                                <td>11.32</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>2.00</td>
+                            </tr>
+                            <tr>
+                                <td>10</td>
+                                <td>01/10/2023</td>
+                                <td>TUE</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>11</td>
+                                <td>01/11/2023</td>
+                                <td>WED</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>12</td>
+                                <td>01/12/2023</td>
+                                <td>THU</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>13</td>
+                                <td>01/13/2023</td>
+                                <td>FRI</td>
+                                <td>REG</td>
+                                <td>8AM-5PM</td>
+                                <td>07:50AM</td>
+                                <td>12:00PM</td>
+                                <td>01:00PM</td>
+                                <td>05:10PM</td>
+                                <td>9.33</td>
+                                <td>8.00</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>14</td>
+                                <td>01/08/2023</td>
+                                <td>SAT</td>
+                                <td>OFF</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+                            <tr>
+                                <td>15</td>
+                                <td>01/15/2023</td>
+                                <td>SUN</td>
+                                <td>OFF</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                                <td>--</td>
+                            </tr>
+
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+
+            <input type="text" hidden readonly id="selectedBillDate" />
+
+        </div>
+    </div>
+</div>
+
+<div class="row" style="margin-left:20px;">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="box box-success">
+                <div class="box-header with-border" style="padding-bottom:0px">
+                    <h3 class="box-title">Summary</h3>
+                </div>
+
+                <div class="box-body" style="padding-top:0px;">
+                    <div class="tbl-containerx">
+                        <table id="myCommonTable">
+                            <thead class="header">
+                                <tr>
+                                    <th style="width:1%">#</th>
+                                    <th style="width:43%">Hours</th>
+                                    <th style="width:5%">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fixed-tbl">
+                                <tr>
+                                    <td>1</td>
+                                    <td>REG HRS</td>
+                                    <td>64.00</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>LATE (Minutes)</td>
+                                    <td>25</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>UNDERTIME</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>REG OT HRS</td>
+                                    <td>2.00</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>REG ND HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>LEAVES WITH PAY</td>
+                                    <td>8.00</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>LEAVES WITHOUT PAY</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>SUSPENSION</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>OFFDAY REG HRS</td>
+                                    <td>--</td>
+                                </tr>
+                               
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+                <input type="text" hidden readonly id="selectedBillDate" />
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4" style="margin-left:10px;">
+        <div class="row">
+            <div class="box box-success">
+                <div class="box-header with-border" style="padding-bottom:0px">
+                    <h3 class="box-title"></h3>
+                </div>
+
+                <div class="box-body" style="padding-top:0px;">
+                    <div class="tbl-containerx">
+                        <table id="myCommonTable">
+                            <thead class="header">
+                                <tr>
+                                    <th style="width:1%">#</th>
+                                    <th style="width:43%">Hours</th>
+                                    <th style="width:5%">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fixed-tbl">
+                                <tr>
+                                    <td>9</td>
+                                    <td>OFFDAY OT HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td>OFFDAY ND HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>SPECIAL HOLIDAY REG HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td>SPECIAL HOLIDAY OT HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td>SPECIAL HOLIDAY ND HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>14</td>
+                                    <td>REG HOLIDAY REG HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td>REG HOLIDAY OT HRS</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td>16</td>
+                                    <td>REG HOLIDAY ND HRS</td>
+                                    <td>--</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+                <input type="text" hidden readonly id="selectedBillDate" />
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="col-md-2" style="margin-left:40px;">
+        <button type="button" class="btn btn-flat " id="btnNew" name="submit" style="margin-right:15px;"><span class="fa fa-print"></span> Print </button>
+    </div>
+</div>

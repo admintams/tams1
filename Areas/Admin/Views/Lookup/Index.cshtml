@@ -1,0 +1,568 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 12px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Lookup Files </b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Admin</a></li>
+        <li class="active"> <a href='@Url.Action("Index","Employee")'>Lookup List</a></li>
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+
+<div class="col-md-10">
+    <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab_4-2" data-toggle="tab" aria-expanded="true" style="padding-left:7px; padding-right:7px;">Department</a></li>
+            <li class=""><a href="#tab_1-1" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Payroll Terms</a></li>
+            <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Work Schedule</a></li>
+            <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Position</a></li>
+            <li class=""><a href="#tab_5-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Employee Type</a></li>
+            <li class=""><a href="#tab_6-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Holiday Type</a></li>
+            <li class=""><a href="#tab_7-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Marital Status</a></li>
+            <li class=""><a href="#tab_8-2" data-toggle="tab" aria-expanded="false" style="padding-left:7px; padding-right:7px;">Employment Status</a></li>
+
+        </ul>
+        <div class="tab-content" style="padding:20px;">
+            <div class="tab-pane" id="tab_1-1" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="PayrolTermsListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_2-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="ShiftListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_3-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="PositionListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane active" id="tab_4-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="DepartmentListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_5-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="EmpTypeListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_6-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="HolidayTypeListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_7-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="MaritalStatusListContainer"></div>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab_8-2" style="height:350px;">
+                <div class="col-md-12" style="margin-top: 10px;">
+                    <div id="EmpStatusListContainer"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="col-md-2">
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        LoadDepartmentList();
+        LoadPayrollTerms();
+        LoadShiftSchedule();
+        LoadPosition();
+        LoadEmployeeType();
+        LoadHolidayType();
+        LoadMaritalStatusType();
+        LoadEmpStatus();
+    });
+
+    function LoadDepartmentList() {
+        var ctr = 0;
+
+        $('#DepartmentListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetDepartment'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#DepartmentListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#DepartmentListContainer').jtable('load');
+
+    }
+
+    function LoadPayrollTerms() {
+        var ctr = 0;
+
+        $('#PayrolTermsListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetPayrollTerms'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#PayrolTermsListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#PayrolTermsListContainer').jtable('load');
+
+    }
+
+    function LoadShiftSchedule() {
+        var ctr = 0;
+
+        $('#ShiftListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetShiftSchedule'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#ShiftListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#ShiftListContainer').jtable('load');
+
+    }
+
+    function LoadPosition() {
+        var ctr = 0;
+
+        $('#PositionListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetPositionList'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#PositionListContainer').jtable('selectedRows');
+                var href;
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#PositionListContainer').jtable('load');
+
+    }
+
+    function LoadEmployeeType() {
+        var ctr = 0;
+
+        $('#EmpTypeListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetEmployeeType'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#EmpTypeListContainer').jtable('selectedRows');
+                var href;
+
+                $('#EmpTypeListContainer').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#EmpTypeListContainer').jtable('load');
+
+    }
+
+    function LoadHolidayType() {
+        var ctr = 0;
+
+        $('#HolidayTypeListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetHolidayType'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#HolidayTypeListContainer').jtable('selectedRows');
+                var href;
+
+                $('#EmpTypeListContainer').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#HolidayTypeListContainer').jtable('load');
+
+    }
+
+    function LoadMaritalStatusType() {
+        var ctr = 0;
+
+        $('#MaritalStatusListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetMaritalStatusList'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#MaritalStatusListContainer').jtable('selectedRows');
+                var href;
+
+                $('#EmpTypeListContainer').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#MaritalStatusListContainer').jtable('load');
+
+    }
+
+    function LoadEmpStatus() {
+        var ctr = 0;
+
+        $('#EmpStatusListContainer').jtable({
+            title: '',
+            paging: true,
+            pageSize: 10,
+            sorting: true,
+            defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/Lookup/GetEmployeeStatusList'
+            },
+            fields: {
+                Ctr: {
+                    title: 'Ctr',
+                    width: '1%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        ctr = ctr + 1;
+                        return ctr;
+                    }
+                },
+                Code: {
+                    title: 'Code',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Description: {
+                    title: 'Description',
+                    width: '6%',
+                    visibility: 'fixed'
+                }
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#EmpStatusListContainer').jtable('selectedRows');
+                var href;
+
+                $('#EmpTypeListContainer').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#EmpStatusListContainer').jtable('load');
+
+    }
+</script>

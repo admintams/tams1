@@ -1,0 +1,293 @@
+﻿@model PAY.Web.Models.HolidayViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "New Employee";
+}
+
+<style>
+    #myCommonTable th, td {
+        padding: 5px !important;
+    }
+
+    #myCommonTable {
+        font-size: 14px !important;
+    }
+
+    .nav-tabs-custom {
+        margin-top: 0px !important;
+    }
+
+    input[type="file"] {
+        opacity: 0; /* make transparent */
+        z-index: -1; /* move under anything else */
+        position: absolute; /* don't let it take up space */
+    }
+
+    div.jtable-column-header-container {
+        height: auto !important;
+    }
+
+    div.jtable-main-container {
+        font-size: 11px;
+    }
+
+    div.jtable-main-container > table.jtable > thead th {
+        font-size: 11px;
+    }
+
+  
+</style>
+
+@section PageHeader {
+    <h1 class="form-theme-color">
+        <b>Time Summary List </b>
+    </h1>
+
+
+
+    <ol class="breadcrumb" style="top:30px;">
+        Current Period: @Session["PeriodDesc"]
+    </ol>
+    <hr class="hrbar" style="margin-bottom:5px;" />
+
+}
+
+<div class="col-md-12" style="padding-top:20px;overflow:auto;" >
+    <div id="TimeSummaryListContainer" ></div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        LoadTimeSummaryList();
+    });
+
+
+    function LoadTimeSummaryList() {
+        var ctr = 0;
+
+        $('#TimeSummaryListContainer').jtable({
+            title: '',
+            //paging: true,
+            //pageSize: 10,
+            sorting: true,
+            //defaultSorting: 'Ctr ASC',
+            selecting: true,
+            selectOnRowClick: true,
+            actions: {
+                listAction: '/admin/TimeSummary/GetTimeSummaryList'
+            },
+            fields: {
+                //Ctr: {
+                //    title: '#',
+                //    key: false,
+                //    create: false,
+                //    edit: false,
+                //    width: '2%',
+                //    visibility: 'fixed',
+                //    display: function (data) {
+                //        ctr = ctr + 1;
+                //        return ctr;
+                //    }
+                //},
+                Name: {
+                    title: 'Emp',
+                    width: '12%',
+                    visibility: 'fixed',
+                    display: function (data) {
+                        return data.record.FullName;
+                    }
+                },
+                RegHrs: {
+                    title: 'Reg Hrs',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                SH_Hrs: {
+                    title: 'SH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RH_Hrs: {
+                    title: 'RH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                HH_Hrs: {
+                    title: 'HH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDSH_Hrs: {
+                    title: 'RD SH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDSH_Hrs: {
+                    title: 'RD SH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDRH_Hrs: {
+                    title: 'RD RH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDSH_Hrs: {
+                    title: 'RD SH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDHH_Hrs: {
+                    title: 'RD HH',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Late: {
+                    title: 'Late',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                UT: {
+                    title: 'UT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                VL: {
+                    title: 'VL',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                SL: {
+                    title: 'SL',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                SIL: {
+                    title: 'SIL',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                SPL: {
+                    title: 'SPL',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                PL: {
+                    title: 'PL',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                ML: {
+                    title: 'ML',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                BL: {
+                    title: 'BL',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RegOT_Hrs: {
+                    title: 'Reg OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                SH_OTHrs: {
+                    title: 'SH OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RH_OTHrs: {
+                    title: 'RH OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RD_OTHrs: {
+                    title: 'RD OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                HH_OTHrs: {
+                    title: 'HH OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDSH_OTHrs: {
+                    title: 'RD SH OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDRH_OTHrs: {
+                    title: 'RD RH OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDHH_OTHrs: {
+                    title: 'RD HH OT',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                Reg_NDHrs: {
+                    title: 'Reg ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RD_NDHrs: {
+                    title: 'RD ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                SH_NDHrs: {
+                    title: 'SH ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RH_NDHrs: {
+                    title: 'RH ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                HH_NDHrs: {
+                    title: 'HH ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDSH_NDHrs: {
+                    title: 'RD SH ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDRH_NDHrs: {
+                    title: 'RD RH ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+                RDHH_NDHrs: {
+                    title: 'RD HH ND',
+                    width: '3%',
+                    visibility: 'fixed'
+                },
+
+               
+            },
+            selectionChanged: function () {
+                //Get all selected rows
+                var $selectedRows = $('#TimeSummaryListContainer').jtable('selectedRows');
+
+                $('#SelectedRowList').empty();
+                if ($selectedRows.length > 0) {
+                    //Show selected rows
+                    $selectedRows.each(function () {
+                        var record = $(this).data('record');
+
+                    });
+                }
+            }
+        });
+
+        $('#TimeSummaryListContainer').jtable('load');
+
+    }
+
+</script>
